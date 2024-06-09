@@ -1,0 +1,7 @@
+server:
+  port: 8080
+
+exchange_rate:
+  api_url: "https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=USD&json"
+  notification_cron: "0 8 * * *"
+

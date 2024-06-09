@@ -1,0 +1,81 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API server for notifying exchange rate",
+        "title": "Exchange rate notifier API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "paths": {
+        "/api/subscribe": {
+            "post": {
+                "description": "subscribe to notifications",
+                "tags": [
+                    "subscription"
+                ],
+                "summary": "Subscribe to notifications",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "email",
+                        "name": "email",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok"
+                    },
+                    "400": {
+                        "description": "invalid email format",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "failed to create subscription",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/unsubscribe": {
+            "post": {
+                "description": "unsubscribe from notifications",
+                "tags": [
+                    "subscription"
+                ],
+                "summary": "Unsubscribe from notifications",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "email",
+                        "name": "email",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok"
+                    },
+                    "400": {
+                        "description": "invalid email format",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "failed to delete subscription",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
