@@ -9,9 +9,6 @@ App stores in PostgreSQL all emails. Then at 8:00 (crone job, can be set up in /
 
 Used style guidelines: https://github.com/golang-standards/project-layout
 
-## API Documentation :coffee:
-{link}
-
 ## Example of notification :milky_way:
 ![image](https://github.com/DimaL-cloud/exchange-rate-notifier-api/assets/78265212/b5acec7a-cb79-4416-985e-ebeb0ed74523)
 
