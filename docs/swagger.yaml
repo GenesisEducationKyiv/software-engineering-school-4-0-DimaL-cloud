@@ -1,0 +1,53 @@
+info:
+  contact: {}
+  description: API server for notifying exchange rate
+  title: Exchange rate notifier API
+  version: "1.0"
+paths:
+  /api/subscribe:
+    post:
+      description: subscribe to notifications
+      parameters:
+      - description: email
+        in: query
+        name: email
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ok
+        "400":
+          description: invalid email format
+          schema:
+            type: string
+        "500":
+          description: failed to create subscription
+          schema:
+            type: string
+      summary: Subscribe to notifications
+      tags:
+      - subscription
+  /api/unsubscribe:
+    post:
+      description: unsubscribe from notifications
+      parameters:
+      - description: email
+        in: query
+        name: email
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ok
+        "400":
+          description: invalid email format
+          schema:
+            type: string
+        "500":
+          description: failed to delete subscription
+          schema:
+            type: string
+      summary: Unsubscribe from notifications
+      tags:
+      - subscription
+swagger: "2.0"
