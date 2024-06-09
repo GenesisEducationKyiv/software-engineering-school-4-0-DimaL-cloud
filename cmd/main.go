@@ -53,6 +53,9 @@ func main() {
 		log.Fatalf("failed to initialize db: %s", err.Error())
 	}
 	driver, err := postgres.WithInstance(db.DB, &postgres.Config{})
+	if err != nil {
+		log.Fatalf("failed to create postgres driver: %s", err.Error())
+	}
 	m, err := migrate.NewWithDatabaseInstance(
 		MigrationsPath,
 		dbConfig.DBName, driver)
@@ -71,7 +74,11 @@ func main() {
 	services := service.NewService(repositories, mailConfig)
 	clients := client.NewClient()
 	handlers := handler.NewHandler(services)
-	scheduler.NewExchangeRateNotificationScheduler(repositories.Subscription, clients.ExchangeRate, services.Mail).StartJob()
+	notificationScheduler := scheduler.NewExchangeRateNotificationScheduler(
+		repositories.Subscription,
+		clients.ExchangeRate,
+		services.Mail)
+	notificationScheduler.StartJob()
 	server := new(exchangeratenotifierapi.Server)
 	go func() {
 		if err := server.Run(viper.GetString("server.port"), handlers.InitRoutes()); err != nil {

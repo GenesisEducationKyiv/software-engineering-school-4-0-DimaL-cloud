@@ -20,7 +20,15 @@ func NewMailService(config MailConfig) *MailService {
 }
 
 func (m MailService) SendEmails(subject string, body string, to []string) error {
-	err := smtp.SendMail(m.config.Host+":"+m.config.Port, smtp.PlainAuth("", m.config.Username, m.config.Password, m.config.Host), m.config.Username, to, []byte("Subject: "+subject+"\r\n\r\n"+body))
+	auth := smtp.PlainAuth("", m.config.Username, m.config.Password, m.config.Host)
+	msg := []byte("Subject: " + subject + "\r\n\r\n" + body)
+	err := smtp.SendMail(
+		m.config.Host+":"+m.config.Port,
+		auth,
+		m.config.Username,
+		to,
+		msg,
+	)
 	if err != nil {
 		return err
 	}

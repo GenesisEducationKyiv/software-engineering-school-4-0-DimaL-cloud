@@ -16,7 +16,7 @@ func NewSubscriptionRepository(db *sqlx.DB) *SubscriptionRepository {
 
 func (s *SubscriptionRepository) GetAllSubscriptions() ([]exchangeratenotifierapi.Subscription, error) {
 	var subscriptions []exchangeratenotifierapi.Subscription
-	query := fmt.Sprintf("SELECT * FROM %s", subscriptionsTable)
+	query := "SELECT * FROM " + subscriptionsTable
 	if err := s.db.Select(&subscriptions, query); err != nil {
 		return nil, err
 	}

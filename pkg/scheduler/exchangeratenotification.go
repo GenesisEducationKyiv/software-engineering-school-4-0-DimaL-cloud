@@ -10,13 +10,22 @@ import (
 	"github.com/spf13/viper"
 )
 
+const (
+	SubjectName = "Курс НБУ"
+	BodyFormat  = "Курс долара НБУ станом на %s: %f грн"
+)
+
 type ExchangeRateNotificationScheduler struct {
 	subscriptionRepository repository.Subscription
 	exchangeRateClient     client.ExchangeRate
 	mailService            service.Mail
 }
 
-func NewExchangeRateNotificationScheduler(subscriptionRepository repository.Subscription, exchangeRateClient client.ExchangeRate, mailService service.Mail) *ExchangeRateNotificationScheduler {
+func NewExchangeRateNotificationScheduler(
+	subscriptionRepository repository.Subscription,
+	exchangeRateClient client.ExchangeRate,
+	mailService service.Mail,
+) *ExchangeRateNotificationScheduler {
 	return &ExchangeRateNotificationScheduler{
 		subscriptionRepository: subscriptionRepository,
 		exchangeRateClient:     exchangeRateClient,
@@ -39,7 +48,12 @@ func (e ExchangeRateNotificationScheduler) StartJob() {
 		for _, subscription := range subscriptions {
 			emails = append(emails, subscription.Email)
 		}
-		err = e.mailService.SendEmails("Курс НБУ", fmt.Sprintf("Курс долара НБУ станом на %s: %f грн", exchangerate.ExchangeDate, exchangerate.Rate), emails)
+		body := fmt.Sprintf(BodyFormat, exchangerate.ExchangeDate, exchangerate.Rate)
+		err = e.mailService.SendEmails(
+			SubjectName,
+			body,
+			emails,
+		)
 		if err != nil {
 			return
 		}
