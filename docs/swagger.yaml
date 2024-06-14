@@ -1,3 +1,9 @@
+definitions:
+  handler.errorResponse:
+    properties:
+      message:
+        type: string
+    type: object
 info:
   contact: {}
   description: API server for notifying exchange rate
@@ -19,11 +25,15 @@ paths:
         "400":
           description: invalid email format
           schema:
-            type: string
+            $ref: '#/definitions/handler.errorResponse'
+        "409":
+          description: subscription already exists
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
         "500":
           description: failed to create subscription
           schema:
-            type: string
+            $ref: '#/definitions/handler.errorResponse'
       summary: Subscribe to notifications
       tags:
       - subscription
@@ -50,4 +60,23 @@ paths:
       summary: Unsubscribe from notifications
       tags:
       - subscription
+  /rate:
+    get:
+      consumes:
+      - application/json
+      description: Get the current exchange rate from the external API
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns the current exchange rate
+          schema:
+            type: string
+        "500":
+          description: failed to get exchange rate
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Get current exchange rate
+      tags:
+      - rate
 swagger: "2.0"

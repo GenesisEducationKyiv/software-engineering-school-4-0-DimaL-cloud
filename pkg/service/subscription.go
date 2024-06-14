@@ -1,8 +1,8 @@
 package service
 
 import (
-	exchangeratenotifierapi "exchange-rate-notifier-api/pkg/models"
-	"exchange-rate-notifier-api/pkg/repository"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/models"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/repository"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -14,7 +14,7 @@ func NewSubscriptionService(repository repository.Subscription) *SubscriptionSer
 	return &SubscriptionService{repository: repository}
 }
 
-func (s *SubscriptionService) GetAllSubscriptions() ([]exchangeratenotifierapi.Subscription, error) {
+func (s *SubscriptionService) GetAllSubscriptions() ([]models.Subscription, error) {
 	return s.repository.GetAllSubscriptions()
 }
 

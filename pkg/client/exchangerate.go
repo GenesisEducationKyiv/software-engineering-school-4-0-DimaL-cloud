@@ -27,15 +27,18 @@ func (e *ExchangeRateClient) GetCurrentExchangeRate() (ExchangeRateResponse, err
 	resp, err := e.client.Get(viper.GetString("exchange_rate.api_url"))
 	if err != nil {
 		log.Errorf("failed to fetch exchange rate: %s", err.Error())
+		return ExchangeRateResponse{}, err
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Errorf("failed to read exchange rate response: %s", err.Error())
+		return ExchangeRateResponse{}, err
 	}
 	var exchangeRates []ExchangeRateResponse
 	if err := json.Unmarshal(body, &exchangeRates); err != nil {
 		log.Errorf("failed to unmarshal exchange rate: %s", err.Error())
+		return ExchangeRateResponse{}, err
 	}
 	return exchangeRates[0], nil
 }

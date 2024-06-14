@@ -1,10 +1,10 @@
 package scheduler
 
 import (
-	"exchange-rate-notifier-api/pkg/client"
-	"exchange-rate-notifier-api/pkg/repository"
-	"exchange-rate-notifier-api/pkg/service"
 	"fmt"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/client"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/repository"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/service"
 	"github.com/robfig/cron"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -38,10 +38,12 @@ func (e ExchangeRateNotificationScheduler) StartJob() {
 	err := c.AddFunc(viper.GetString("exchange_rate.notification_cron"), func() {
 		exchangerate, err := e.exchangeRateClient.GetCurrentExchangeRate()
 		if err != nil {
+			log.Errorf("failed to get current exchange rate: %s", err.Error())
 			return
 		}
 		subscriptions, err := e.subscriptionRepository.GetAllSubscriptions()
 		if err != nil {
+			log.Errorf("failed to get subscriptions: %s", err.Error())
 			return
 		}
 		var emails []string
@@ -55,6 +57,7 @@ func (e ExchangeRateNotificationScheduler) StartJob() {
 			emails,
 		)
 		if err != nil {
+			log.Errorf("failed to send emails: %s", err.Error())
 			return
 		}
 	})

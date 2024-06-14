@@ -1,6 +1,21 @@
 server:
   port: 8080
 
+db:
+  host: localhost
+  port: 5432
+  username: postgres
+  password: admin
+  name: postgres
+  ssl_mode: disable
+  driver_name: postgres
+
+mail:
+  host: smtp.gmail.com
+  port: 587
+  username: {YOUR MAIL USERNAME}
+  password: {YOUR MAIL PASSWORD}
+
 exchange_rate:
   api_url: "https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=USD&json"
   notification_cron: "0 8 * * *"

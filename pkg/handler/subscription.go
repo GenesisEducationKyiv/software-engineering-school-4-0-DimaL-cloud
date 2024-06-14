@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"errors"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/models"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/mail"
@@ -11,9 +13,10 @@ import (
 // @Description subscribe to notifications
 // @Param email query string true "email"
 // @Success 200 "ok"
-// @Failure 400 {string} string "email is empty"
-// @Failure 400 {string} string "invalid email format"
-// @Failure 500 {string} string "failed to create subscription"
+// @Failure 400 {object} handler.errorResponse "email is empty"
+// @Failure 400 {object} handler.errorResponse "invalid email format"
+// @Failure 409 {object} handler.errorResponse "subscription already exists"
+// @Failure 500 {object} handler.errorResponse "failed to create subscription"
 // @Router /api/subscribe [post]
 func (h *Handler) subscribe(c *gin.Context) {
 	email := c.Query("email")
@@ -28,6 +31,10 @@ func (h *Handler) subscribe(c *gin.Context) {
 	}
 	err = h.services.Subscription.CreateSubscription(email)
 	if err != nil {
+		if errors.Is(err, models.ErrDuplicateEmail) {
+			newError(c, http.StatusConflict, "subscription already exists")
+			return
+		}
 		newError(c, http.StatusInternalServerError, "failed to create subscription")
 		return
 	}
