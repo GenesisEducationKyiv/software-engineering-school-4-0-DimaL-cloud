@@ -3,25 +3,29 @@ package main
 import (
 	"context"
 	"errors"
-	"exchange-rate-notifier-api/pkg/client"
-	"exchange-rate-notifier-api/pkg/handler"
-	exchangeratenotifierapi "exchange-rate-notifier-api/pkg/models"
-	"exchange-rate-notifier-api/pkg/repository"
-	"exchange-rate-notifier-api/pkg/scheduler"
-	"exchange-rate-notifier-api/pkg/service"
+	_ "github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/docs"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/client"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/handler"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/models"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/repository"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/scheduler"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/service"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
-const MigrationsPath = "file://migrations"
+const (
+	MigrationsPath         = "file://migrations"
+	ShutdownTimeoutSeconds = 5
+)
 
 // @title Exchange rate notifier API
 // @version 1.0
@@ -30,29 +34,29 @@ func main() {
 	if err := initConfig(); err != nil {
 		log.Fatalf("error initializing configs: %s", err.Error())
 	}
-	if err := godotenv.Load(); err != nil {
-		log.Fatalf("error loading env variables: %s", err.Error())
-	}
 	dbConfig := repository.DBConfig{
-		Host:       os.Getenv("DB_HOST"),
-		Port:       os.Getenv("DB_PORT"),
-		Username:   os.Getenv("DB_USERNAME"),
-		Password:   os.Getenv("DB_PASSWORD"),
-		DBName:     os.Getenv("DB_NAME"),
-		SSLMode:    os.Getenv("DB_SSL_MODE"),
-		DriverName: os.Getenv("DB_DRIVER_NAME"),
+		Host:       viper.GetString("db.host"),
+		Port:       viper.GetString("db.port"),
+		Username:   viper.GetString("db.username"),
+		Password:   viper.GetString("db.password"),
+		DBName:     viper.GetString("db.name"),
+		SSLMode:    viper.GetString("db.ssl_mode"),
+		DriverName: viper.GetString("db.driver_name"),
 	}
 	mailConfig := service.MailConfig{
-		Host:     os.Getenv("MAIL_HOST"),
-		Port:     os.Getenv("MAIL_PORT"),
-		Username: os.Getenv("MAIL_USERNAME"),
-		Password: os.Getenv("MAIL_PASSWORD"),
+		Host:     viper.GetString("mail.host"),
+		Port:     viper.GetString("mail.port"),
+		Username: viper.GetString("mail.username"),
+		Password: viper.GetString("mail.password"),
 	}
 	db, err := repository.NewDB(dbConfig)
 	if err != nil {
 		log.Fatalf("failed to initialize db: %s", err.Error())
 	}
 	driver, err := postgres.WithInstance(db.DB, &postgres.Config{})
+	if err != nil {
+		log.Fatalf("failed to create postgres driver: %s", err.Error())
+	}
 	m, err := migrate.NewWithDatabaseInstance(
 		MigrationsPath,
 		dbConfig.DBName, driver)
@@ -71,8 +75,12 @@ func main() {
 	services := service.NewService(repositories, mailConfig)
 	clients := client.NewClient()
 	handlers := handler.NewHandler(services)
-	scheduler.NewExchangeRateNotificationScheduler(repositories.Subscription, clients.ExchangeRate, services.Mail).StartJob()
-	server := new(exchangeratenotifierapi.Server)
+	notificationScheduler := scheduler.NewExchangeRateNotificationScheduler(
+		repositories.Subscription,
+		clients.ExchangeRate,
+		services.Mail)
+	notificationScheduler.StartJob()
+	server := new(models.Server)
 	go func() {
 		if err := server.Run(viper.GetString("server.port"), handlers.InitRoutes()); err != nil {
 			log.Fatalf("failed to start server: %s", err.Error())
@@ -86,7 +94,9 @@ func main() {
 	<-quit
 
 	log.Print("Exchange rate notifier shutting down")
-	if err := server.Shutdown(context.Background()); err != nil {
+	ctx, cancel := context.WithTimeout(context.Background(), ShutdownTimeoutSeconds*time.Second)
+	defer cancel()
+	if err := server.Shutdown(ctx); err != nil {
 		log.Errorf("error occurred while shutting down server: %s", err.Error())
 	}
 	if err := db.Close(); err != nil {

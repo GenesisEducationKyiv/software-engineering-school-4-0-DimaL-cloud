@@ -1,12 +1,12 @@
 package service
 
 import (
-	exchangeratenotifierapi "exchange-rate-notifier-api/pkg/models"
-	"exchange-rate-notifier-api/pkg/repository"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/models"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/repository"
 )
 
 type Subscription interface {
-	GetAllSubscriptions() ([]exchangeratenotifierapi.Subscription, error)
+	GetAllSubscriptions() ([]models.Subscription, error)
 	CreateSubscription(email string) error
 	DeleteSubscription(email string) error
 }

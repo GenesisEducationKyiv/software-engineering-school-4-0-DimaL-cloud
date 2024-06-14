@@ -1,12 +1,10 @@
 package handler
 
 import (
-	"exchange-rate-notifier-api/pkg/service"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/service"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-
-	_ "exchange-rate-notifier-api/docs"
 )
 
 type Handler struct {

@@ -38,13 +38,19 @@ const docTemplate = `{
                     "400": {
                         "description": "invalid email format",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "subscription already exists",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "500": {
                         "description": "failed to create subscription",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     }
                 }
@@ -82,6 +88,45 @@ const docTemplate = `{
                             "type": "string"
                         }
                     }
+                }
+            }
+        },
+        "/rate": {
+            "get": {
+                "description": "Get the current exchange rate from the external API",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rate"
+                ],
+                "summary": "Get current exchange rate",
+                "responses": {
+                    "200": {
+                        "description": "Returns the current exchange rate",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "failed to get exchange rate",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "handler.errorResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
                 }
             }
         }
