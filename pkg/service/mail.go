@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/configs"
 	"net/smtp"
 )
 
@@ -12,10 +13,10 @@ type MailConfig struct {
 }
 
 type MailService struct {
-	config MailConfig
+	config configs.Mail
 }
 
-func NewMailService(config MailConfig) *MailService {
+func NewMailService(config configs.Mail) *MailService {
 	return &MailService{config: config}
 }
 

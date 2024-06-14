@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/configs"
 	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/models"
 	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/repository"
 )
@@ -20,9 +21,9 @@ type Service struct {
 	Mail
 }
 
-func NewService(repositories *repository.Repository, mailConfig MailConfig) *Service {
+func NewService(repositories *repository.Repository, config *configs.Config) *Service {
 	return &Service{
 		Subscription: NewSubscriptionService(repositories.Subscription),
-		Mail:         NewMailService(mailConfig),
+		Mail:         NewMailService(config.Mail),
 	}
 }
