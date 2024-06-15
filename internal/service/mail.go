@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/configs"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/configs"
 	"net/smtp"
 )
 

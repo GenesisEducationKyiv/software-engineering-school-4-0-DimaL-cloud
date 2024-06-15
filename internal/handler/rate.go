@@ -2,7 +2,7 @@ package handler
 
 import (
 	"fmt"
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/client"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/client"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

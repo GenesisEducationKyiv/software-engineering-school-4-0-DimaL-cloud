@@ -2,7 +2,7 @@ package repository
 
 import (
 	"fmt"
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/configs"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/configs"
 	"github.com/jmoiron/sqlx"
 )
 

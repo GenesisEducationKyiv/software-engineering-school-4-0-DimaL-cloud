@@ -2,9 +2,9 @@ package scheduler
 
 import (
 	"fmt"
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/client"
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/repository"
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/service"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/client"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/repository"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/service"
 	"github.com/avast/retry-go/v4"
 	"github.com/robfig/cron"
 	log "github.com/sirupsen/logrus"

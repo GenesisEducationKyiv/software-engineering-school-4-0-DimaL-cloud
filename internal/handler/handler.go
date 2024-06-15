@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/service"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/service"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
