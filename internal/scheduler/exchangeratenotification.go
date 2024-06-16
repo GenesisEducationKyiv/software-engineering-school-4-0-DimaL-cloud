@@ -5,17 +5,14 @@ import (
 	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/client"
 	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/repository"
 	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/service"
-	"github.com/avast/retry-go/v4"
 	"github.com/robfig/cron"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"time"
 )
 
 const (
-	SubjectName   = "Курс НБУ"
-	BodyFormat    = "Курс долара НБУ станом на %s: %f грн"
-	RetriesAmount = 3
+	SubjectName = "Курс НБУ"
+	BodyFormat  = "Курс долара НБУ станом на %s: %f грн"
 )
 
 type ExchangeRateNotificationScheduler struct {
@@ -39,13 +36,7 @@ func NewExchangeRateNotificationScheduler(
 func (e *ExchangeRateNotificationScheduler) StartJob() {
 	c := cron.New()
 	err := c.AddFunc(viper.GetString("exchange_rate.notification_cron"), func() {
-		var rate client.ExchangeRateResponse
-		err := retry.Do(
-			func() error {
-				var err error
-				rate, err = e.exchangeRateClient.GetCurrentExchangeRate()
-				return err
-			}, e.getRetryOptions()...)
+		rate, err := e.exchangeRateClient.GetCurrentExchangeRate()
 		if err != nil {
 			log.Errorf("failed to get current exchange rate: %s", err.Error())
 			return
@@ -74,14 +65,4 @@ func (e *ExchangeRateNotificationScheduler) StartJob() {
 		log.Fatalf("failed to schedule exchange rate notification job: %s", err.Error())
 	}
 	c.Start()
-}
-
-func (e *ExchangeRateNotificationScheduler) getRetryOptions() []retry.Option {
-	return []retry.Option{
-		retry.Attempts(uint(RetriesAmount)),
-		retry.OnRetry(func(n uint, err error) {
-			log.Infof("Retry request %d to and get error: %v", n+1, err)
-		}),
-		retry.Delay(time.Second),
-	}
 }
