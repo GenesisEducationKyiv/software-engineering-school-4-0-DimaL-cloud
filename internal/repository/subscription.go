@@ -33,7 +33,7 @@ func (s *SubscriptionRepository) CreateSubscription(email string) error {
 		var pgError *pq.Error
 		if errors.As(err, &pgError) {
 			if pgError.Code == "23505" && strings.Contains(pgError.Message, "subscription_email_key") {
-				return models.ErrDuplicateEmail
+				return models.ErrEmailAlreadyExists
 			}
 		}
 		return err
