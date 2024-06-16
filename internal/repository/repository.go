@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/models"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/models"
 	"github.com/jmoiron/sqlx"
 )
 

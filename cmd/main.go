@@ -4,12 +4,13 @@ import (
 	"context"
 	"errors"
 	_ "github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/docs"
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/client"
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/handler"
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/models"
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/repository"
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/scheduler"
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/pkg/service"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/client"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/configs"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/handler"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/models"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/repository"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/scheduler"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/service"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -34,22 +35,12 @@ func main() {
 	if err := initConfig(); err != nil {
 		log.Fatalf("error initializing configs: %s", err.Error())
 	}
-	dbConfig := repository.DBConfig{
-		Host:       viper.GetString("db.host"),
-		Port:       viper.GetString("db.port"),
-		Username:   viper.GetString("db.username"),
-		Password:   viper.GetString("db.password"),
-		DBName:     viper.GetString("db.name"),
-		SSLMode:    viper.GetString("db.ssl_mode"),
-		DriverName: viper.GetString("db.driver_name"),
+	conf, err := configs.NewConfig("configs/config.yml")
+	if err != nil {
+		log.Fatalf("error initializing configs: %s", err.Error())
 	}
-	mailConfig := service.MailConfig{
-		Host:     viper.GetString("mail.host"),
-		Port:     viper.GetString("mail.port"),
-		Username: viper.GetString("mail.username"),
-		Password: viper.GetString("mail.password"),
-	}
-	db, err := repository.NewDB(dbConfig)
+	log.Info(conf.Mail.Host)
+	db, err := repository.NewDB(conf.DB)
 	if err != nil {
 		log.Fatalf("failed to initialize db: %s", err.Error())
 	}
@@ -57,22 +48,20 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to create postgres driver: %s", err.Error())
 	}
-	m, err := migrate.NewWithDatabaseInstance(
-		MigrationsPath,
-		dbConfig.DBName, driver)
+	m, err := migrate.NewWithDatabaseInstance(MigrationsPath, conf.DB.DBName, driver)
 	if err != nil {
 		log.Fatalf("failed to create migration instance: %s", err.Error())
 	}
 	err = m.Up()
 	if err != nil {
 		if errors.Is(err, migrate.ErrNoChange) {
-			log.Print("No migrations to apply")
+			log.Info("No migrations to apply")
 		} else {
 			log.Fatalf("failed to apply migrations: %s", err.Error())
 		}
 	}
 	repositories := repository.NewRepository(db)
-	services := service.NewService(repositories, mailConfig)
+	services := service.NewService(repositories, conf)
 	clients := client.NewClient()
 	handlers := handler.NewHandler(services)
 	notificationScheduler := scheduler.NewExchangeRateNotificationScheduler(
@@ -82,7 +71,7 @@ func main() {
 	notificationScheduler.StartJob()
 	server := new(models.Server)
 	go func() {
-		if err := server.Run(viper.GetString("server.port"), handlers.InitRoutes()); err != nil {
+		if err := server.Run(handlers.InitRoutes()); err != nil {
 			log.Fatalf("failed to start server: %s", err.Error())
 		}
 	}()

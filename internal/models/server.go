@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"github.com/spf13/viper"
 	"net/http"
 	"time"
 )
@@ -15,9 +16,9 @@ const (
 	TimeoutDuration    = 10 * time.Second
 )
 
-func (s *Server) Run(port string, handler http.Handler) error {
+func (s *Server) Run(handler http.Handler) error {
 	s.httpServer = &http.Server{
-		Addr:           ":" + port,
+		Addr:           ":" + viper.GetString("server.port"),
 		Handler:        handler,
 		MaxHeaderBytes: MaxHeaderBytesSize,
 		ReadTimeout:    TimeoutDuration,
