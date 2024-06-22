@@ -2,12 +2,12 @@ package scheduler
 
 import (
 	"fmt"
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/client"
 	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/repository"
 	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/service"
 	"github.com/robfig/cron"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"time"
 )
 
 const (
@@ -17,26 +17,27 @@ const (
 
 type ExchangeRateNotificationScheduler struct {
 	subscriptionRepository repository.Subscription
-	exchangeRateClient     client.ExchangeRate
+	rateService            service.Rate
 	mailService            service.Mail
 }
 
 func NewExchangeRateNotificationScheduler(
 	subscriptionRepository repository.Subscription,
-	exchangeRateClient client.ExchangeRate,
+	rateService service.Rate,
 	mailService service.Mail,
 ) *ExchangeRateNotificationScheduler {
 	return &ExchangeRateNotificationScheduler{
 		subscriptionRepository: subscriptionRepository,
-		exchangeRateClient:     exchangeRateClient,
+		rateService:            rateService,
 		mailService:            mailService,
 	}
 }
 
 func (e *ExchangeRateNotificationScheduler) StartJob() {
 	c := cron.New()
-	err := c.AddFunc(viper.GetString("exchange_rate.notification_cron"), func() {
-		rate, err := e.exchangeRateClient.GetCurrentExchangeRate()
+	err := c.AddFunc(viper.GetString("rate.notification_cron"), func() {
+		currentDate := time.Now().Format("02.01.2006")
+		rate, err := e.rateService.GetRate()
 		if err != nil {
 			log.Errorf("failed to get current exchange rate: %s", err.Error())
 			return
@@ -50,7 +51,7 @@ func (e *ExchangeRateNotificationScheduler) StartJob() {
 		for _, subscription := range subscriptions {
 			emails = append(emails, subscription.Email)
 		}
-		body := fmt.Sprintf(BodyFormat, rate.ExchangeDate, rate.Rate)
+		body := fmt.Sprintf(BodyFormat, currentDate, rate)
 		err = e.mailService.SendEmails(
 			SubjectName,
 			body,

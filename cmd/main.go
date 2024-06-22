@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	_ "github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/docs"
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/client"
+	clients "github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/client"
 	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/configs"
 	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/handler"
 	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/models"
@@ -17,6 +17,7 @@ import (
 	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -61,12 +62,12 @@ func main() {
 		}
 	}
 	repositories := repository.NewRepository(db)
-	services := service.NewService(repositories, conf)
-	clients := client.NewClient()
+	clients := clients.NewClient(&http.Client{}, conf)
+	services := service.NewService(repositories, conf, clients)
 	handlers := handler.NewHandler(services)
 	notificationScheduler := scheduler.NewExchangeRateNotificationScheduler(
 		repositories.Subscription,
-		clients.ExchangeRate,
+		services.Rate,
 		services.Mail)
 	notificationScheduler.StartJob()
 	server := new(models.Server)

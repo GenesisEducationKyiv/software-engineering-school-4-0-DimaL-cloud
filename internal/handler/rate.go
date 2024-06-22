@@ -2,7 +2,6 @@ package handler
 
 import (
 	"fmt"
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/client"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -16,10 +15,9 @@ import (
 // @Failure 500 {object} handler.errorResponse "failed to get exchange rate"
 // @Router /rate [get]
 func (h *Handler) rate(c *gin.Context) {
-	rateClient := client.NewExchangeRateClient()
-	rate, err := rateClient.GetCurrentExchangeRate()
+	rate, err := h.services.GetRate()
 	if err != nil {
 		newError(c, http.StatusInternalServerError, "failed to get exchange rate")
 	}
-	c.String(http.StatusOK, fmt.Sprintf("%f", rate.Rate))
+	c.String(http.StatusOK, fmt.Sprintf("%f", rate))
 }

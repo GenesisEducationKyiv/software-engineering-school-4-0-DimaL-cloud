@@ -8,6 +8,7 @@ import (
 type Config struct {
 	Mail Mail `yaml:"mail"`
 	DB   DB   `yaml:"db"`
+	Rate Rate `yaml:"rate"`
 }
 
 func NewConfig(configPath string) (*Config, error) {
