@@ -31,7 +31,7 @@ type USD struct {
 func (f *FawazahmedRateClient) GetRate() (float64, error) {
 	resp, err := f.client.Get(f.apiURL)
 	if err != nil {
-		log.Printf("failed to fetch Fawazahmed exchange rate: %s", err.Error())
+		log.Printf("failed to fetch Fawazahmed rate API: %s", err.Error())
 		return 0, err
 	}
 	defer resp.Body.Close()

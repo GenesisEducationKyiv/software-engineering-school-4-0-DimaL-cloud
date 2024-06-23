@@ -4,6 +4,13 @@ import (
 	"errors"
 	clients "github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/client"
 	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/client/rate"
+	"github.com/avast/retry-go/v4"
+	log "github.com/sirupsen/logrus"
+	"time"
+)
+
+const (
+	RetriesAmount = 3
 )
 
 type RateService struct {
@@ -19,15 +26,31 @@ func NewRateService(clients *clients.Client) *RateService {
 }
 
 func (r *RateService) GetRate() (float64, error) {
+	var rateValue float64
+	var err error
 	currentClient := r.client
-
 	for currentClient != nil {
-		value, err := currentClient.GetRate()
+		err = retry.Do(
+			func() error {
+				rateValue, err = currentClient.GetRate()
+				return err
+			},
+			r.getRetryOptions()...,
+		)
 		if err == nil {
-			return value, nil
+			return rateValue, nil
 		}
 		currentClient = currentClient.GetNext()
 	}
+	return 0, errors.New("failed to get exchange rate from all APIs")
+}
 
-	return 0, errors.New("failed to get exchange rate from all clients")
+func (r *RateService) getRetryOptions() []retry.Option {
+	return []retry.Option{
+		retry.Attempts(uint(RetriesAmount)),
+		retry.OnRetry(func(n uint, err error) {
+			log.Infof("Retry request %d to and get error: %v", n+1, err)
+		}),
+		retry.Delay(time.Second),
+	}
 }
