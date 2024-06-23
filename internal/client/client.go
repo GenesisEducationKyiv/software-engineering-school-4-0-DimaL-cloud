@@ -6,10 +6,6 @@ import (
 	"net/http"
 )
 
-type ExchangeRate interface {
-	GetCurrentExchangeRate() (ExchangeRateResponse, error)
-}
-
 type Client struct {
 	NbuRate        rate.Rate
 	PrivatBankRate rate.Rate
