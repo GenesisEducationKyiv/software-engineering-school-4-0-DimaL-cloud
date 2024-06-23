@@ -37,6 +37,7 @@ func (p *PrivatBankRateClient) GetRate() (float64, error) {
 		log.Errorf("failed to read PrivatBank exchange rate response: %s", err.Error())
 		return 0, err
 	}
+	log.Printf("PrivatBank rate API response: %s", string(body))
 	return p.parseRateResponse(body)
 }
 

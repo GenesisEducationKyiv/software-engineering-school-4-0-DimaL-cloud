@@ -36,6 +36,7 @@ func (nrc *NbuRateClient) GetRate() (float64, error) {
 		log.Errorf("failed to read NBU exchange rate response: %s", err.Error())
 		return 0, err
 	}
+	log.Printf("NBU rate API response: %s", string(body))
 	return nrc.parseRateResponse(body)
 }
 

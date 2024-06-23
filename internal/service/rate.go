@@ -13,7 +13,8 @@ type RateService struct {
 func NewRateService(clients *clients.Client) *RateService {
 	r := &RateService{}
 	r.client = clients.NbuRate
-	r.client.SetNext(clients.PrivatBankRate)
+	r.client.SetNext(clients.PrivatBankRate).
+		SetNext(clients.FawazahmedRate)
 	return r
 }
 
