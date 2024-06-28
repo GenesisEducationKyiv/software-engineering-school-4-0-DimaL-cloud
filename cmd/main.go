@@ -63,7 +63,11 @@ func main() {
 	}
 	repositories := repository.NewRepository(db)
 	clients := clients.NewClient(&http.Client{}, conf)
-	services := service.NewService(repositories, conf, clients)
+	initialRateClient := clients.NbuRate
+	initialRateClient.
+		SetNext(clients.PrivatBankRate).
+		SetNext(clients.FawazahmedRate)
+	services := service.NewService(repositories, conf, initialRateClient)
 	handlers := handler.NewHandler(services)
 	notificationScheduler := scheduler.NewExchangeRateNotificationScheduler(
 		repositories.Subscription,

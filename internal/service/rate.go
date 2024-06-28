@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	clients "github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/client"
 	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/client/rate"
 	"github.com/avast/retry-go/v4"
 	log "github.com/sirupsen/logrus"
@@ -10,24 +9,23 @@ import (
 
 const (
 	RetriesAmount = 3
+	Delay         = 100
 )
 
 type RateService struct {
-	client rate.Rate
+	initialRateClient rate.Rate
 }
 
-func NewRateService(clients *clients.Client) *RateService {
-	r := &RateService{}
-	r.client = clients.NbuRate
-	r.client.SetNext(clients.PrivatBankRate).
-		SetNext(clients.FawazahmedRate)
-	return r
+func NewRateService(initialRateClient rate.Rate) *RateService {
+	return &RateService{
+		initialRateClient: initialRateClient,
+	}
 }
 
 func (r *RateService) GetRate() (float64, error) {
 	var rateResponse rate.Response
 	var err error
-	currentClient := r.client
+	currentClient := r.initialRateClient
 	for currentClient != nil {
 		err = retry.Do(
 			func() error {
@@ -51,6 +49,6 @@ func (r *RateService) getRetryOptions() []retry.Option {
 		retry.OnRetry(func(n uint, err error) {
 			log.Infof("Retry request %d to and get error: %v", n+1, err)
 		}),
-		retry.Delay(100),
+		retry.Delay(Delay),
 	}
 }
