@@ -6,7 +6,6 @@ import (
 	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/client/rate"
 	"github.com/avast/retry-go/v4"
 	log "github.com/sirupsen/logrus"
-	"time"
 )
 
 const (
@@ -52,6 +51,6 @@ func (r *RateService) getRetryOptions() []retry.Option {
 		retry.OnRetry(func(n uint, err error) {
 			log.Infof("Retry request %d to and get error: %v", n+1, err)
 		}),
-		retry.Delay(time.Second),
+		retry.Delay(100),
 	}
 }
