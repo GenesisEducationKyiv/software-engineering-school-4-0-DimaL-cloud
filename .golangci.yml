@@ -1,0 +1,20 @@
+linters:
+  enable:
+    - gocyclo
+    - stylecheck
+    - gosec
+    - unconvert
+    - gocritic
+    - exportloopref
+    - revive
+    - bodyclose
+    - exhaustive
+    - godox
+    - lll
+    - mnd
+    - whitespace
+    - bidichk
+    - usestdlibvars
+    - loggercheck
+    - misspell
+    - perfsprint

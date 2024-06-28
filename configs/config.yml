@@ -1,0 +1,25 @@
+server:
+  port: 8080
+
+db:
+  host: localhost
+  port: 5432
+  username: postgres
+  password: admin
+  name: postgres
+  ssl_mode: disable
+  driver_name: postgres
+
+mail:
+  host: smtp.gmail.com
+  port: 587
+  username: YOUR_MAIL_USERNAME
+  password: YOUR_MAIL_PASSWORD
+
+rate:
+  api_urls:
+    nbu: "https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=USD&json"
+    privatbank: "https://api.privatbank.ua/p24api/pubinfo?exchange&json&coursid=11"
+    fawazahmed: "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json"
+  notification_cron: "0 8 * * *"
+
