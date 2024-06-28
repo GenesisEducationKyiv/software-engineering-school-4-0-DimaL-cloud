@@ -11,7 +11,7 @@ import (
 type PrivatBankRateClient struct {
 	client *http.Client
 	apiURL string
-	next   Rate
+	ClientChain
 }
 
 func NewPrivatBankRateClient(client *http.Client, apiURL string) *PrivatBankRateClient {
@@ -55,13 +55,4 @@ func (p *PrivatBankRateClient) parseRateResponse(body []byte) (float64, error) {
 	}
 
 	return rate, nil
-}
-
-func (p *PrivatBankRateClient) GetNext() Rate {
-	return p.next
-}
-
-func (p *PrivatBankRateClient) SetNext(next Rate) Rate {
-	p.next = next
-	return next
 }

@@ -10,7 +10,7 @@ import (
 type NbuRateClient struct {
 	client *http.Client
 	apiURL string
-	next   Rate
+	ClientChain
 }
 
 func NewNbuRateClient(client *http.Client, apiURL string) *NbuRateClient {
@@ -49,13 +49,4 @@ func (nrc *NbuRateClient) parseRateResponse(body []byte) (float64, error) {
 	}
 	exchangeRate = exchangeRates[0]
 	return exchangeRate.Rate, nil
-}
-
-func (nrc *NbuRateClient) GetNext() Rate {
-	return nrc.next
-}
-
-func (nrc *NbuRateClient) SetNext(next Rate) Rate {
-	nrc.next = next
-	return next
 }

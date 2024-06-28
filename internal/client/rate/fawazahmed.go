@@ -10,7 +10,7 @@ import (
 type FawazahmedRateClient struct {
 	client *http.Client
 	apiURL string
-	next   Rate
+	ClientChain
 }
 
 func NewFawazahmedRateClient(client *http.Client, apiURL string) *FawazahmedRateClient {
@@ -51,13 +51,4 @@ func (f *FawazahmedRateClient) parseRateResponse(body []byte) (float64, error) {
 		return 0, err
 	}
 	return exchangeRate.USD.UAH, nil
-}
-
-func (f *FawazahmedRateClient) GetNext() Rate {
-	return f.next
-}
-
-func (f *FawazahmedRateClient) SetNext(next Rate) Rate {
-	f.next = next
-	return next
 }
