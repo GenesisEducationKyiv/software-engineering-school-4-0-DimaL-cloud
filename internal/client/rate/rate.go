@@ -1,9 +1,15 @@
 package rate
 
 type Rate interface {
-	GetRate() (float64, error)
+	GetRate() (Response, error)
 	GetNext() Rate
 	SetNext(rateClient Rate) Rate
+}
+
+type Response struct {
+	RateValue   float64
+	APIResponse string
+	APIName     string
 }
 
 type ClientChain struct {

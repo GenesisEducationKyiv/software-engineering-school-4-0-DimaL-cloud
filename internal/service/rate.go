@@ -26,19 +26,20 @@ func NewRateService(clients *clients.Client) *RateService {
 }
 
 func (r *RateService) GetRate() (float64, error) {
-	var rateValue float64
+	var rateResponse rate.Response
 	var err error
 	currentClient := r.client
 	for currentClient != nil {
 		err = retry.Do(
 			func() error {
-				rateValue, err = currentClient.GetRate()
+				rateResponse, err = currentClient.GetRate()
 				return err
 			},
 			r.getRetryOptions()...,
 		)
 		if err == nil {
-			return rateValue, nil
+			log.Infof("API response from %s: %s", rateResponse.APIName, rateResponse.APIResponse)
+			return rateResponse.RateValue, nil
 		}
 		currentClient = currentClient.GetNext()
 	}

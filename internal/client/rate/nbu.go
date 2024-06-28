@@ -24,29 +24,32 @@ type NbuRateResponse struct {
 	Rate float64 `json:"rate"`
 }
 
-func (nrc *NbuRateClient) GetRate() (float64, error) {
+func (nrc *NbuRateClient) GetRate() (Response, error) {
 	resp, err := nrc.client.Get(nrc.apiURL)
 	if err != nil {
 		log.Errorf("failed to fetch NBU exchange rate: %s", err.Error())
-		return 0, err
+		return Response{}, err
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Errorf("failed to read NBU exchange rate response: %s", err.Error())
-		return 0, err
+		return Response{}, err
 	}
-	log.Printf("NBU rate API response: %s", string(body))
 	return nrc.parseRateResponse(body)
 }
 
-func (nrc *NbuRateClient) parseRateResponse(body []byte) (float64, error) {
+func (nrc *NbuRateClient) parseRateResponse(body []byte) (Response, error) {
 	var exchangeRate NbuRateResponse
 	var exchangeRates []NbuRateResponse
 	if err := json.Unmarshal(body, &exchangeRates); err != nil {
 		log.Errorf("failed to unmarshal exchange rate: %s", err.Error())
-		return 0, err
+		return Response{}, err
 	}
 	exchangeRate = exchangeRates[0]
-	return exchangeRate.Rate, nil
+	return Response{
+		RateValue:   exchangeRate.Rate,
+		APIResponse: string(body),
+		APIName:     "NBU",
+	}, nil
 }
