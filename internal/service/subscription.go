@@ -6,6 +6,12 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+type Subscription interface {
+	GetAllSubscriptions() ([]models.Subscription, error)
+	CreateSubscription(email string) error
+	DeleteSubscription(email string) error
+}
+
 type SubscriptionService struct {
 	repository repository.Subscription
 }

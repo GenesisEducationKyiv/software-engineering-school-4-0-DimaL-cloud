@@ -12,6 +12,10 @@ const (
 	Delay         = 100
 )
 
+type Rate interface {
+	GetRate() (float64, error)
+}
+
 type RateService struct {
 	initialRateClient rate.Rate
 }

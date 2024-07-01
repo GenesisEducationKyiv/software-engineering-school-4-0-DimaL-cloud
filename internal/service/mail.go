@@ -5,11 +5,8 @@ import (
 	"net/smtp"
 )
 
-type MailConfig struct {
-	Host     string
-	Port     string
-	Username string
-	Password string
+type Mail interface {
+	SendEmails(subject string, body string, to []string) error
 }
 
 type MailService struct {

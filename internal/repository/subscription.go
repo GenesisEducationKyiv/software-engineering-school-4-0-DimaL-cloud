@@ -9,6 +9,12 @@ import (
 	"strings"
 )
 
+type Subscription interface {
+	GetAllSubscriptions() ([]models.Subscription, error)
+	CreateSubscription(email string) error
+	DeleteSubscription(email string) error
+}
+
 type SubscriptionRepository struct {
 	db *sqlx.DB
 }
