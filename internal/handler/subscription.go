@@ -29,7 +29,7 @@ func (h *Handler) subscribe(c *gin.Context) {
 		newError(c, http.StatusBadRequest, "invalid email format")
 		return
 	}
-	err = h.services.Subscription.CreateSubscription(email)
+	err = h.subscriptionService.CreateSubscription(email)
 	if err != nil {
 		if errors.Is(err, models.ErrDuplicateEmail) {
 			newError(c, http.StatusConflict, "subscription already exists")
@@ -60,7 +60,7 @@ func (h *Handler) unsubscribe(c *gin.Context) {
 		newError(c, http.StatusBadRequest, "invalid email format")
 		return
 	}
-	err = h.services.Subscription.DeleteSubscription(email)
+	err = h.subscriptionService.DeleteSubscription(email)
 	if err != nil {
 		newError(c, http.StatusInternalServerError, "failed to delete subscription")
 		return

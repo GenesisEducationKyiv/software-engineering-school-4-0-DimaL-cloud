@@ -8,11 +8,15 @@ import (
 )
 
 type Handler struct {
-	services *service.Service
+	rateService         service.Rate
+	subscriptionService service.Subscription
 }
 
-func NewHandler(services *service.Service) *Handler {
-	return &Handler{services: services}
+func NewHandler(rateService service.Rate, subscriptionService service.Subscription) *Handler {
+	return &Handler{
+		rateService:         rateService,
+		subscriptionService: subscriptionService,
+	}
 }
 
 func (h *Handler) InitRoutes() *gin.Engine {
