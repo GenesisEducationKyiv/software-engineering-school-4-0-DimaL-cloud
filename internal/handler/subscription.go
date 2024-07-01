@@ -31,7 +31,7 @@ func (h *Handler) subscribe(c *gin.Context) {
 	}
 	err = h.services.Subscription.CreateSubscription(email)
 	if err != nil {
-		if errors.Is(err, models.ErrDuplicateEmail) {
+		if errors.Is(err, models.ErrEmailAlreadyExists) {
 			newError(c, http.StatusConflict, "subscription already exists")
 			return
 		}
