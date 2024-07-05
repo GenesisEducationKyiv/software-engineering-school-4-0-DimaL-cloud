@@ -2,11 +2,10 @@ package scheduler
 
 import (
 	"fmt"
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/repository"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/configs"
 	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/service"
 	"github.com/robfig/cron"
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 	"time"
 )
 
@@ -15,34 +14,37 @@ const (
 	BodyFormat  = "Курс долара НБУ станом на %s: %f грн"
 )
 
-type ExchangeRateNotificationScheduler struct {
-	subscriptionRepository repository.Subscription
-	rateService            service.Rate
-	mailService            service.Mail
+type RateNotificationScheduler struct {
+	subscriptionService service.Subscription
+	rateService         service.Rate
+	mailService         service.Mail
+	config              *configs.Rate
 }
 
-func NewExchangeRateNotificationScheduler(
-	subscriptionRepository repository.Subscription,
+func NewRateNotificationScheduler(
+	subscriptionService service.Subscription,
 	rateService service.Rate,
 	mailService service.Mail,
-) *ExchangeRateNotificationScheduler {
-	return &ExchangeRateNotificationScheduler{
-		subscriptionRepository: subscriptionRepository,
-		rateService:            rateService,
-		mailService:            mailService,
+	config *configs.Rate,
+) *RateNotificationScheduler {
+	return &RateNotificationScheduler{
+		subscriptionService: subscriptionService,
+		rateService:         rateService,
+		mailService:         mailService,
+		config:              config,
 	}
 }
 
-func (e *ExchangeRateNotificationScheduler) StartJob() {
+func (e *RateNotificationScheduler) StartJob() {
 	c := cron.New()
-	err := c.AddFunc(viper.GetString("rate.notification_cron"), func() {
+	err := c.AddFunc(e.config.NotificationCron, func() {
 		currentDate := time.Now().Format("02.01.2006")
 		rate, err := e.rateService.GetRate()
 		if err != nil {
 			log.Errorf("failed to get current exchange rate: %s", err.Error())
 			return
 		}
-		subscriptions, err := e.subscriptionRepository.GetAllSubscriptions()
+		subscriptions, err := e.subscriptionService.GetAllSubscriptions()
 		if err != nil {
 			log.Errorf("failed to get subscriptions: %s", err.Error())
 			return

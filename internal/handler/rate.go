@@ -15,7 +15,7 @@ import (
 // @Failure 500 {object} handler.errorResponse "failed to get exchange rate"
 // @Router /rate [get]
 func (h *Handler) rate(c *gin.Context) {
-	rate, err := h.services.GetRate()
+	rate, err := h.rateService.GetRate()
 	if err != nil {
 		newError(c, http.StatusInternalServerError, "failed to get exchange rate")
 	}
