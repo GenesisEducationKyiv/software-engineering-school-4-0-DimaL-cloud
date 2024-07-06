@@ -3,31 +3,32 @@ package main
 import (
 	"context"
 	"errors"
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/client"
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/client/rate"
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/configs"
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/handler"
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/models"
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/repository"
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/scheduler"
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/service"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/jmoiron/sqlx"
 	log "github.com/sirupsen/logrus"
 	"go.uber.org/fx"
 	"net/http"
+	"rate-service/internal/client"
+	"rate-service/internal/client/rate"
+	"rate-service/internal/configs"
+	"rate-service/internal/handler"
+	"rate-service/internal/models"
+	"rate-service/internal/repository"
+	"rate-service/internal/scheduler"
+	"rate-service/internal/service"
 )
 
 const (
 	MigrationsPath = "file://migrations"
+	ConfigPath     = "configs/config.yml"
 )
 
 func NewApp() *fx.App {
 	return fx.New(
 		fx.Provide(client.NewHTTPClient),
 		fx.Provide(func() (*configs.Config, error) {
-			return configs.NewConfig("configs/config.yml")
+			return configs.NewConfig(ConfigPath)
 		}),
 		fx.Provide(func(config *configs.Config) *configs.DB {
 			return &config.DB

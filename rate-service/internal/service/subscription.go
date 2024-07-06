@@ -1,9 +1,9 @@
 package service
 
 import (
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/models"
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/repository"
 	log "github.com/sirupsen/logrus"
+	"rate-service/internal/models"
+	"rate-service/internal/repository"
 )
 
 type Subscription interface {

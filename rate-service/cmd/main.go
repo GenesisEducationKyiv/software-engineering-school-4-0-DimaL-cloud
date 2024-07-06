@@ -2,12 +2,12 @@ package main
 
 import (
 	"context"
-	_ "github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/docs"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
 	"os"
 	"os/signal"
+	_ "rate-service/docs"
 	"syscall"
 	"time"
 )

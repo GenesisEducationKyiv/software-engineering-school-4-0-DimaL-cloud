@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/configs"
 	"net/http"
+	"rate-service/internal/configs"
 	"time"
 )
 

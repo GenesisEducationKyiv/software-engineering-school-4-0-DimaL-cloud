@@ -2,9 +2,9 @@ package service
 
 import (
 	"errors"
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/client/rate"
 	"github.com/avast/retry-go/v4"
 	log "github.com/sirupsen/logrus"
+	"rate-service/internal/client/rate"
 )
 
 const (

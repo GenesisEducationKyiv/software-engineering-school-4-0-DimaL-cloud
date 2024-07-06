@@ -2,10 +2,10 @@ package scheduler
 
 import (
 	"fmt"
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/configs"
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/service"
 	"github.com/robfig/cron"
 	log "github.com/sirupsen/logrus"
+	"rate-service/internal/configs"
+	"rate-service/internal/service"
 	"time"
 )
 

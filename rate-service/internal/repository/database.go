@@ -2,8 +2,8 @@ package repository
 
 import (
 	"fmt"
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/configs"
 	"github.com/jmoiron/sqlx"
+	"rate-service/internal/configs"
 )
 
 const (

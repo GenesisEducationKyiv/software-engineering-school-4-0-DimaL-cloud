@@ -2,10 +2,10 @@ package handler
 
 import (
 	"errors"
-	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-DimaL-cloud/internal/models"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/mail"
+	"rate-service/internal/models"
 )
 
 // @Summary Subscribe to notifications
