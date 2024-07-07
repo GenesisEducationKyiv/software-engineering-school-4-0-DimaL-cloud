@@ -9,6 +9,10 @@ import (
 	"strings"
 )
 
+const (
+	subscriptionsTable = "subscription"
+)
+
 type Subscription interface {
 	GetAllSubscriptions() ([]models.Subscription, error)
 	CreateSubscription(email string) error

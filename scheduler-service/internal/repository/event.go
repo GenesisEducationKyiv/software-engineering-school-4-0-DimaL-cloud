@@ -1,8 +1,13 @@
 package repository
 
 import (
+	"fmt"
 	"github.com/jmoiron/sqlx"
 	"scheduler-service/internal/models"
+)
+
+const (
+	eventsTable = "event"
 )
 
 type Event interface {
@@ -18,7 +23,7 @@ func NewEventRepository(db *sqlx.DB) *EventRepository {
 }
 
 func (e *EventRepository) SaveEvent(event models.Event) error {
-	query := "INSERT INTO events (type, timestamp, body) VALUES ($1, $2, $3)"
+	query := fmt.Sprintf("INSERT INTO %s (type, timestamp, body) VALUES ($1, $2, $3)", eventsTable)
 	_, err := e.db.Exec(query, event.Type, event.Timestamp, event.Body)
 	return err
 }

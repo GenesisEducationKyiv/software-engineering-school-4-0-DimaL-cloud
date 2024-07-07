@@ -19,7 +19,6 @@ import (
 	"rate-service/internal/messaging/producer"
 	"rate-service/internal/models"
 	"rate-service/internal/repository"
-	"rate-service/internal/scheduler"
 	"rate-service/internal/service"
 )
 
@@ -84,7 +83,6 @@ func NewApp() *fx.App {
 			),
 		),
 		fx.Provide(handler.NewHandler),
-		fx.Provide(scheduler.NewRateNotificationScheduler),
 		fx.Provide(func(handler *handler.Handler, config *configs.Server) *http.Server {
 			return models.NewServer(handler.InitRoutes(), config)
 		}),

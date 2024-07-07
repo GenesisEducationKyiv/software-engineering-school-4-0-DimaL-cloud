@@ -6,13 +6,9 @@ import (
 	"scheduler-service/internal/configs"
 )
 
-const (
-	cronEvent = "cronEvent"
-)
-
 func NewDB(config *configs.DB) (*sqlx.DB, error) {
-	connectionString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-		config.Host, config.Port, config.Username, config.Password, config.DBName, config.SSLMode)
+	connectionString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s search_path=%s",
+		config.Host, config.Port, config.Username, config.Password, config.DBName, config.SSLMode, config.SearchPath)
 	db, err := sqlx.Open(config.DriverName, connectionString)
 	if err != nil {
 		return nil, err

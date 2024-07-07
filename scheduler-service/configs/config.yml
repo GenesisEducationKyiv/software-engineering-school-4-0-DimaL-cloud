@@ -6,6 +6,7 @@ db:
   name: postgres
   ssl_mode: disable
   driver_name: postgres
+  search_path: scheduler-service
 
 crons:
   rate_notification: "0 8 * * *"

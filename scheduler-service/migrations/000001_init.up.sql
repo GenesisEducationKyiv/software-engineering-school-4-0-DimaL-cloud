@@ -1,4 +1,4 @@
-CREATE SCHEMA "mail-service";
+CREATE SCHEMA "scheduler-service";
 
 CREATE TABLE event
 (
