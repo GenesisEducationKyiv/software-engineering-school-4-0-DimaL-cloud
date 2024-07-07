@@ -3,16 +3,18 @@ package main
 import (
 	log "github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
-	"notification-service/internal/configs"
-	"notification-service/internal/messaging/consumer"
-	"notification-service/internal/service"
 	"os"
 	"os/signal"
+	"scheduler-service/internal/configs"
+	"scheduler-service/internal/repository"
+	"scheduler-service/internal/scheduler"
 	"syscall"
+	"time"
 )
 
 const (
-	ConfigPath = "configs/config.yml"
+	ConfigPath      = "configs/config.yml"
+	ShutdownTimeout = 5 * time.Second
 )
 
 func main() {
@@ -34,15 +36,29 @@ func main() {
 	}
 	defer channel.Close()
 
-	mailService := service.NewMailService(config.Mail)
-
-	mailConsumer := consumer.NewMailConsumer(channel, mailService)
-	mailConsumer.StartConsuming()
+	_, err = channel.QueueDeclare(
+		"rate-notification-cron",
+		false,
+		false,
+		false,
+		false,
+		nil,
+	)
+	if err != nil {
+		log.Fatalf("failed to declare a queue: %s", err.Error())
+	}
+	db, err := repository.NewDB(&config.DB)
+	eventRepository := repository.NewEventRepository(db)
+	rateNotificationScheduler := scheduler.NewRateNotificationScheduler(&config.Crons, channel, eventRepository)
+	rateNotificationScheduler.StartJob()
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
+	if err := db.Close(); err != nil {
+		log.Errorf("error occurred while closing db connection: %s", err.Error())
+	}
 	if err := conn.Close(); err != nil {
 		log.Errorf("error occurred while closing RabbitMQ connection: %s", err.Error())
 	}

@@ -6,22 +6,35 @@ services:
     ports:
       - "8080:8080"
     build:
-      context: ..
+      context: ./rate-service
       dockerfile: Dockerfile
     restart: always
     depends_on:
-      - postgres
+      - rate-service-db
+      - rabbitmq
   notification-service:
     image: notification-service:latest
     ports:
       - "8081:8080"
     build:
-      context: ..
+      context: ./notification-service
       dockerfile: Dockerfile
     restart: always
     depends_on:
-      - postgres
-  postgres:
+      - rate-service-db
+      - rabbitmq
+  scheduler-service:
+    image: scheduler-service:latest
+    ports:
+      - "8082:8080"
+    build:
+      context: ./scheduler-service
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - rate-service-db
+      - rabbitmq
+  rate-service-db:
     image: postgres:latest
     environment:
       POSTGRES_USER: postgres
@@ -30,12 +43,22 @@ services:
     ports:
       - "5432:5432"
     restart: always
+  scheduler-service-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: postgres
+    ports:
+      - "5433:5432"
+    restart: always
   rabbitmq:
     image: rabbitmq:3.13.4-management
     hostname: rabbitmq
     restart: always
     environment:
-      - RABBITMQ_DEFAULT_USER=rmuser
-      - RABBITMQ_DEFAULT_PASS=rmpassword
+      RABBITMQ_DEFAULT_USER: rmuser
+      RABBITMQ_DEFAULT_PASS: rmpassword
     ports:
       - "15672:15672"
+      - "5672:5672"

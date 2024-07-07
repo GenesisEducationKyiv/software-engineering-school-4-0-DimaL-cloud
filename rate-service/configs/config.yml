@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8084
 
 db:
   host: localhost
@@ -9,12 +9,7 @@ db:
   name: postgres
   ssl_mode: disable
   driver_name: postgres
-
-mail:
-  host: smtp.gmail.com
-  port: 587
-  username: YOUR_MAIL_USERNAME
-  password: YOUR_MAIL_PASSWORD
+  search_path: rate
 
 rate:
   api_urls:

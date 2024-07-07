@@ -3,16 +3,20 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/jmoiron/sqlx"
 	log "github.com/sirupsen/logrus"
+	"github.com/streadway/amqp"
 	"go.uber.org/fx"
 	"net/http"
 	"rate-service/internal/client"
 	"rate-service/internal/client/rate"
 	"rate-service/internal/configs"
 	"rate-service/internal/handler"
+	"rate-service/internal/messaging/consumer"
+	"rate-service/internal/messaging/producer"
 	"rate-service/internal/models"
 	"rate-service/internal/repository"
 	"rate-service/internal/scheduler"
@@ -85,6 +89,10 @@ func NewApp() *fx.App {
 			return models.NewServer(handler.InitRoutes(), config)
 		}),
 		fx.Provide(NewMigrateInstance),
+		fx.Provide(NewRabbitMQConnection),
+		fx.Provide(NewRabbitMQChannel),
+		fx.Provide(consumer.NewRateNotificationCronConsumer),
+		fx.Provide(producer.NewMailProducer),
 		fx.Invoke(run),
 	)
 }
@@ -98,12 +106,36 @@ func NewMigrateInstance(db *sqlx.DB, config *configs.DB) (*migrate.Migrate, erro
 	return migrate.NewWithDatabaseInstance(MigrationsPath, config.DBName, driver)
 }
 
-func run(lc fx.Lifecycle, s *http.Server, db *sqlx.DB, m *migrate.Migrate) {
+func NewRabbitMQConnection() (*amqp.Connection, error) {
+	conn, err := amqp.Dial("amqp://rmuser:rmpassword@localhost:5672/")
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to RabbitMQ: %w", err)
+	}
+	return conn, nil
+}
+
+func NewRabbitMQChannel(conn *amqp.Connection) (*amqp.Channel, error) {
+	channel, err := conn.Channel()
+	if err != nil {
+		return nil, fmt.Errorf("failed to open a channel: %w", err)
+	}
+	return channel, nil
+}
+
+func run(
+	lc fx.Lifecycle,
+	s *http.Server,
+	db *sqlx.DB,
+	m *migrate.Migrate,
+	conn *amqp.Connection,
+	c *consumer.RateNotificationCronConsumer,
+	ch *amqp.Channel) {
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error { //nolint:revive
 			applyMigrations(m)
+			createMailQueue(ch)
+			go c.StartConsuming()
 			go startServer(s)
-			log.Info("Exchange rate notifier started")
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
@@ -112,6 +144,9 @@ func run(lc fx.Lifecycle, s *http.Server, db *sqlx.DB, m *migrate.Migrate) {
 			}
 			if err := db.Close(); err != nil {
 				log.Errorf("error occurred while closing db connection: %s", err.Error())
+			}
+			if err := conn.Close(); err != nil {
+				log.Errorf("error occurred while closing RabbitMQ connection: %s", err.Error())
 			}
 			return nil
 		},
@@ -134,5 +169,19 @@ func startServer(s *http.Server) {
 		if !errors.Is(err, http.ErrServerClosed) {
 			log.Fatalf("failed to start server: %s", err.Error())
 		}
+	}
+}
+
+func createMailQueue(channel *amqp.Channel) {
+	_, err := channel.QueueDeclare(
+		"mail",
+		true,
+		false,
+		false,
+		false,
+		nil,
+	)
+	if err != nil {
+		log.Fatalf("failed to declare a queue: %s", err.Error())
 	}
 }
