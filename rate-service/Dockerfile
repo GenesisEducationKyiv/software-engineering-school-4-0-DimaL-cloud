@@ -1,6 +1,6 @@
 FROM golang:1.22-alpine
-WORKDIR /app
+WORKDIR /rate-service
 COPY .. .
 RUN go build -o main ./cmd/main.go
 EXPOSE 8080
-ENTRYPOINT ["/app/main"]
+ENTRYPOINT ["/rate-service/main"]
