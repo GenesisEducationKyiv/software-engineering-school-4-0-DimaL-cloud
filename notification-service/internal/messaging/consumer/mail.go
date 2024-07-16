@@ -8,6 +8,11 @@ import (
 	"notification-service/internal/service"
 )
 
+const (
+	QueueName   = "mail"
+	ServiceName = "mail-service"
+)
+
 type MailConsumer struct {
 	channel     *amqp.Channel
 	mailService service.Mail
@@ -22,8 +27,8 @@ func NewMailConsumer(channel *amqp.Channel, mailService service.Mail) *MailConsu
 
 func (c *MailConsumer) StartConsuming() {
 	msgs, err := c.channel.Consume(
-		"mail",
-		"mail-service",
+		QueueName,
+		ServiceName,
 		false,
 		false,
 		false,

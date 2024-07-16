@@ -18,3 +18,8 @@ rate:
     fawazahmed: "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json"
   notification_cron: "0 8 * * *"
 
+rabbitmq:
+  host: localhost
+  port: 5672
+  username: rmuser
+  password: rmpassword

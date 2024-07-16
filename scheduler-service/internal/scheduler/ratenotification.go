@@ -7,7 +7,6 @@ import (
 	"github.com/streadway/amqp"
 	"scheduler-service/internal/configs"
 	"scheduler-service/internal/models"
-	"scheduler-service/internal/repository"
 	"time"
 )
 
@@ -16,26 +15,23 @@ const (
 )
 
 type RateNotificationScheduler struct {
-	config          *configs.Crons
-	channel         *amqp.Channel
-	eventRepository repository.Event
+	config  *configs.Crons
+	channel *amqp.Channel
 }
 
 func NewRateNotificationScheduler(
 	config *configs.Crons,
 	channel *amqp.Channel,
-	eventRepository repository.Event,
 ) *RateNotificationScheduler {
 	return &RateNotificationScheduler{
-		config:          config,
-		channel:         channel,
-		eventRepository: eventRepository,
+		config:  config,
+		channel: channel,
 	}
 }
 
 func (e *RateNotificationScheduler) StartJob() {
 	c := cron.New()
-	err := c.AddFunc("*/30 * * * *", func() {
+	err := c.AddFunc(e.config.RateNotification, func() {
 		event := models.Event{
 			Type:      EventType,
 			Timestamp: time.Now(),
@@ -59,7 +55,6 @@ func (e *RateNotificationScheduler) StartJob() {
 		} else {
 			log.Info("event published")
 		}
-		err = e.eventRepository.SaveEvent(event)
 		if err != nil {
 			log.Fatalf("failed to save event: %s", err.Error())
 		}

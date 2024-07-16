@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	log "github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
 	"notification-service/internal/configs"
@@ -21,7 +22,12 @@ func main() {
 		log.Fatalf("failed to read config: %s", err.Error())
 	}
 
-	conn, err := amqp.Dial("amqp://rmuser:rmpassword@localhost:5672/")
+	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%s/",
+		config.RabbitMQ.Username,
+		config.RabbitMQ.Password,
+		config.RabbitMQ.Host,
+		config.RabbitMQ.Port,
+	))
 	if err != nil {
 		log.Fatalf("failed to connect to RabbitMQ: %s", err.Error())
 	}

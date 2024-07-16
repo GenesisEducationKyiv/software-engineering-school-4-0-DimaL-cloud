@@ -3,7 +3,7 @@ package repository
 import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
-	"scheduler-service/internal/models"
+	"rate-service/internal/models"
 )
 
 const (

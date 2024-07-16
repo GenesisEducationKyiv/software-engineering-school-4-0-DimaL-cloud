@@ -1,7 +1,10 @@
 package models
 
-type SendEmailCommand struct {
-	Subject string   `json:"subject"`
-	Body    string   `json:"body"`
-	To      []string `json:"to"`
+import "time"
+
+type Event struct {
+	ID        int       `json:"id"`
+	Type      string    `json:"type"`
+	Timestamp time.Time `json:"timestamp"`
+	Body      string    `json:"body"`
 }

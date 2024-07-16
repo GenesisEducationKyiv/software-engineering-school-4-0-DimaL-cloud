@@ -13,7 +13,8 @@ import (
 const (
 	EmailSubject = "Курс НБУ"
 	EmailBody    = "Курс долара НБУ станом на %s: %f грн"
-	EventName    = "RateNotificationCronReceived"
+	QueueName    = "rate-notification-cron"
+	ServiceName  = "rate-service"
 )
 
 type RateNotificationCronConsumer struct {
@@ -38,8 +39,8 @@ func NewRateNotificationCronConsumer(
 
 func (c *RateNotificationCronConsumer) StartConsuming() {
 	msgs, err := c.channel.Consume(
-		"rate-notification-cron",
-		"rate-service",
+		QueueName,
+		ServiceName,
 		false,
 		false,
 		false,

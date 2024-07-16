@@ -1,3 +1,9 @@
+rabbitmq:
+  host: localhost
+  port: 5672
+  username: rmuser
+  password: rmpassword
+
 mail:
   host: smtp.gmail.com
   port: 587

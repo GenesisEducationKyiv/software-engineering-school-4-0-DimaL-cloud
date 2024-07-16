@@ -6,8 +6,8 @@ import (
 )
 
 type Config struct {
-	Crons Crons `yaml:"crons"`
-	DB    DB    `yaml:"db"`
+	Crons    Crons    `yaml:"crons"`
+	RabbitMQ RabbitMQ `yaml:"rabbitmq"`
 }
 
 func NewConfig(configPath string) (*Config, error) {

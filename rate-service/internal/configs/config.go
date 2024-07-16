@@ -6,10 +6,11 @@ import (
 )
 
 type Config struct {
-	Mail   Mail   `yaml:"mail"`
-	DB     DB     `yaml:"db"`
-	Rate   Rate   `yaml:"rate"`
-	Server Server `yaml:"server"`
+	Mail     Mail     `yaml:"mail"`
+	DB       DB       `yaml:"db"`
+	Rate     Rate     `yaml:"rate"`
+	Server   Server   `yaml:"server"`
+	RabbitMQ RabbitMQ `yaml:"rabbitmq"`
 }
 
 func NewConfig(configPath string) (*Config, error) {

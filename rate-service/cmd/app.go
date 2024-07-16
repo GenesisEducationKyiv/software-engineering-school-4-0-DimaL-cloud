@@ -45,6 +45,9 @@ func NewApp() *fx.App {
 		fx.Provide(func(config *configs.Config) *configs.Server {
 			return &config.Server
 		}),
+		fx.Provide(func(config *configs.Config) *configs.RabbitMQ {
+			return &config.RabbitMQ
+		}),
 		fx.Provide(repository.NewDB),
 		fx.Provide(func(client *http.Client, config *configs.Config) *rate.NbuRateClient {
 			return rate.NewNbuRateClient(client, config.Rate.APIUrls.Nbu)
@@ -104,8 +107,13 @@ func NewMigrateInstance(db *sqlx.DB, config *configs.DB) (*migrate.Migrate, erro
 	return migrate.NewWithDatabaseInstance(MigrationsPath, config.DBName, driver)
 }
 
-func NewRabbitMQConnection() (*amqp.Connection, error) {
-	conn, err := amqp.Dial("amqp://rmuser:rmpassword@localhost:5672/")
+func NewRabbitMQConnection(config *configs.RabbitMQ) (*amqp.Connection, error) {
+	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%s/",
+		config.Username,
+		config.Password,
+		config.Host,
+		config.Port,
+	))
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to RabbitMQ: %w", err)
 	}
