@@ -127,22 +127,23 @@ func NewRabbitMQChannel(conn *amqp.Connection) (*amqp.Channel, error) {
 
 func run(
 	lc fx.Lifecycle,
-	s *http.Server,
+	server *http.Server,
 	db *sqlx.DB,
-	m *migrate.Migrate,
+	migrate *migrate.Migrate,
 	conn *amqp.Connection,
-	c *consumer.RateNotificationCronConsumer,
-	ch *amqp.Channel) {
+	rateNotificationCronConsumer *consumer.RateNotificationCronConsumer,
+	channel *amqp.Channel,
+	rabbitMQConfig *configs.RabbitMQ) {
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error { //nolint:revive
-			applyMigrations(m)
-			createMailQueue(ch)
-			go c.StartConsuming()
-			go startServer(s)
+			applyMigrations(migrate)
+			createMailQueue(channel, rabbitMQConfig)
+			go rateNotificationCronConsumer.StartConsuming()
+			go startServer(server)
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			if err := s.Shutdown(ctx); err != nil {
+			if err := server.Shutdown(ctx); err != nil {
 				log.Errorf("error occurred while shutting down server: %s", err.Error())
 			}
 			if err := db.Close(); err != nil {
@@ -175,9 +176,9 @@ func startServer(s *http.Server) {
 	}
 }
 
-func createMailQueue(channel *amqp.Channel) {
+func createMailQueue(channel *amqp.Channel, config *configs.RabbitMQ) {
 	_, err := channel.QueueDeclare(
-		"mail",
+		config.Queue.Mail,
 		true,
 		false,
 		false,

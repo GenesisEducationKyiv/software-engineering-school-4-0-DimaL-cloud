@@ -22,4 +22,5 @@ rabbitmq:
   username: rmuser
   password: rmpassword
   queue:
+    mail: mail
     rate_notification_cron: rate-notification-cron

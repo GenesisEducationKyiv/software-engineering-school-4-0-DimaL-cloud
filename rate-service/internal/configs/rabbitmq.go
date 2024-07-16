@@ -6,6 +6,7 @@ type RabbitMQ struct {
 	Username string `yaml:"username"`
 	Password string `yaml:"password"`
 	Queue    struct {
+		Mail                 string `yaml:"mail"`
 		RateNotificationCron string `yaml:"rate-notification-cron"`
 	} `yaml:"queue"`
 }
