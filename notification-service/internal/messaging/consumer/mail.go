@@ -41,6 +41,7 @@ func (c *MailConsumer) StartConsuming() {
 	}
 	go func() {
 		for msg := range msgs {
+			log.Errorf("received a message: %s", msg.Body)
 			c.handleMessage(msg)
 			if err := msg.Ack(false); err != nil {
 				log.Errorf("failed to acknowledge message: %s", err.Error())
@@ -56,5 +57,5 @@ func (c *MailConsumer) handleMessage(msg amqp.Delivery) {
 		log.Errorf("failed to deserialize message: %s", err.Error())
 		return
 	}
-	c.mailService.SendEmails(sendEmailCommand.Subject, sendEmailCommand.Body, sendEmailCommand.To)
+	c.mailService.SendEmail(sendEmailCommand.Subject, sendEmailCommand.Body, sendEmailCommand.To)
 }

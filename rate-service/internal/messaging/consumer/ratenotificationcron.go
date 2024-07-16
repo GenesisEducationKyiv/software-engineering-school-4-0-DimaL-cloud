@@ -53,6 +53,8 @@ func (c *RateNotificationCronConsumer) StartConsuming() {
 	}
 	go func() {
 		for msg := range msgs {
+			log.Infof("received a message: %s", msg.Body)
+			c.handleMessage()
 			if err := msg.Ack(false); err != nil {
 				log.Errorf("failed to acknowledge message: %s", err.Error())
 			}
@@ -72,14 +74,12 @@ func (c *RateNotificationCronConsumer) handleMessage() {
 		return
 	}
 	currentDate := time.Now().Format("02.01.2006")
-	var emails []string
-	for _, subscription := range subscriptions {
-		emails = append(emails, subscription.Email)
-	}
 	sendEmailCommand := models.SendEmailCommand{
 		Subject: EmailSubject,
 		Body:    fmt.Sprintf(EmailBody, currentDate, rate),
-		To:      emails,
 	}
-	c.mailProducer.PublishMail(sendEmailCommand)
+	for _, subscription := range subscriptions {
+		sendEmailCommand.To = subscription.Email
+		c.mailProducer.PublishMail(sendEmailCommand)
+	}
 }

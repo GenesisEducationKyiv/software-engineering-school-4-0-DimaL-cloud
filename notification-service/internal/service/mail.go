@@ -4,7 +4,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"net/smtp"
 	"notification-service/internal/configs"
-	"sync"
 )
 
 const (
@@ -12,7 +11,7 @@ const (
 )
 
 type Mail interface {
-	SendEmails(subject string, body string, to []string)
+	SendEmail(subject string, body string, to string)
 }
 
 type MailService struct {
@@ -25,32 +24,17 @@ func NewMailService(config configs.Mail) *MailService {
 	return &MailService{config: config, auth: auth}
 }
 
-func (m MailService) SendEmails(subject string, body string, to []string) {
+func (m MailService) SendEmail(subject string, body string, to string) {
 	msg := []byte("Subject: " + subject + "\r\n\r\n" + body)
 
-	var wg sync.WaitGroup
-	emailTasks := make(chan string, len(to))
-	for i := 0; i < maxWorkers; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			for email := range emailTasks {
-				err := smtp.SendMail(
-					m.config.Host+":"+m.config.Port,
-					m.auth,
-					m.config.Username,
-					[]string{email},
-					msg,
-				)
-				if err != nil {
-					log.Errorf("failed to send email to %s: %s", email, err.Error())
-				}
-			}
-		}()
+	err := smtp.SendMail(
+		m.config.Host+":"+m.config.Port,
+		m.auth,
+		m.config.Username,
+		[]string{to},
+		msg,
+	)
+	if err != nil {
+		log.Errorf("failed to send email to %s: %s", to, err.Error())
 	}
-	for _, recipient := range to {
-		emailTasks <- recipient
-	}
-	close(emailTasks)
-	wg.Wait()
 }
