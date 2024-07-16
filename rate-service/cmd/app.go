@@ -39,9 +39,6 @@ func NewApp() *fx.App {
 		fx.Provide(func(config *configs.Config) *configs.Rate {
 			return &config.Rate
 		}),
-		fx.Provide(func(config *configs.Config) *configs.Mail {
-			return &config.Mail
-		}),
 		fx.Provide(func(config *configs.Config) *configs.Server {
 			return &config.Server
 		}),
@@ -64,7 +61,6 @@ func NewApp() *fx.App {
 				fx.As(new(repository.Subscription)),
 			),
 		),
-		fx.Provide(service.NewMailService),
 		fx.Provide(
 			fx.Annotate(
 				service.NewSubscriptionService,

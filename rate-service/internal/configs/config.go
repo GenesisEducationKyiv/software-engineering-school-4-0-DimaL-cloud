@@ -6,7 +6,6 @@ import (
 )
 
 type Config struct {
-	Mail     Mail     `yaml:"mail"`
 	DB       DB       `yaml:"db"`
 	Rate     Rate     `yaml:"rate"`
 	Server   Server   `yaml:"server"`
