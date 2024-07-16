@@ -43,15 +43,6 @@ services:
     ports:
       - "5432:5432"
     restart: always
-  scheduler-service-db:
-    image: postgres:latest
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: postgres
-    ports:
-      - "5433:5432"
-    restart: always
   rabbitmq:
     image: rabbitmq:3.13.4-management
     hostname: rabbitmq

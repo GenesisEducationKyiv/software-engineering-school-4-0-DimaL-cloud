@@ -8,5 +8,4 @@ type DB struct {
 	DBName     string `yaml:"name"`
 	SSLMode    string `yaml:"ssl_mode"`
 	DriverName string `yaml:"driver_name"`
-	SearchPath string `yaml:"search_path"`
 }

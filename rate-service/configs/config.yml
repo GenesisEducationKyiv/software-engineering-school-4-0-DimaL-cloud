@@ -9,7 +9,6 @@ db:
   name: postgres
   ssl_mode: disable
   driver_name: postgres
-  search_path: rate-service
 
 rate:
   api_urls:
