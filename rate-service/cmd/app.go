@@ -23,8 +23,9 @@ import (
 )
 
 const (
-	MigrationsPath = "file://migrations"
-	ConfigPath     = "configs/config.yml"
+	MigrationsPath          = "file://migrations"
+	ConfigPath              = "configs/config.yml"
+	RabbitMQConnStrTemplate = "amqp://%s:%s@%s:%s/"
 )
 
 func NewApp() *fx.App {
@@ -104,7 +105,7 @@ func NewMigrateInstance(db *sqlx.DB, config *configs.DB) (*migrate.Migrate, erro
 }
 
 func NewRabbitMQConnection(config *configs.RabbitMQ) (*amqp.Connection, error) {
-	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%s/",
+	conn, err := amqp.Dial(fmt.Sprintf(RabbitMQConnStrTemplate,
 		config.Username,
 		config.Password,
 		config.Host,

@@ -13,7 +13,8 @@ import (
 )
 
 const (
-	ConfigPath = "configs/config.yml"
+	ConfigPath              = "configs/config.yml"
+	RabbitMQConnStrTemplate = "amqp://%s:%s@%s:%s/"
 )
 
 func main() {
@@ -22,7 +23,7 @@ func main() {
 		log.Fatalf("failed to read config: %s", err.Error())
 	}
 
-	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%s/",
+	conn, err := amqp.Dial(fmt.Sprintf(RabbitMQConnStrTemplate,
 		config.RabbitMQ.Username,
 		config.RabbitMQ.Password,
 		config.RabbitMQ.Host,
