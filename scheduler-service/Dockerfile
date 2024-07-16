@@ -1,6 +1,6 @@
 FROM golang:1.22-alpine
-WORKDIR /scheduler-service
-COPY .. .
-RUN go build -o main ./cmd/main.go
+WORKDIR /app
+COPY . .
+RUN go build -o main ./cmd
 EXPOSE 8080
-ENTRYPOINT ["/scheduler-service/main"]
+ENTRYPOINT ["/app/main"]
