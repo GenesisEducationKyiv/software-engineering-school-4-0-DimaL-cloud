@@ -21,3 +21,5 @@ rabbitmq:
   port: 5672
   username: rmuser
   password: rmpassword
+  queue:
+    rate_notification_cron: rate-notification-cron

@@ -15,23 +15,26 @@ const (
 )
 
 type RateNotificationScheduler struct {
-	config  *configs.Crons
-	channel *amqp.Channel
+	cronConfig     *configs.Crons
+	rabbitMQConfig *configs.RabbitMQ
+	channel        *amqp.Channel
 }
 
 func NewRateNotificationScheduler(
-	config *configs.Crons,
+	cronConfig *configs.Crons,
+	rabbitMQConfig *configs.RabbitMQ,
 	channel *amqp.Channel,
 ) *RateNotificationScheduler {
 	return &RateNotificationScheduler{
-		config:  config,
-		channel: channel,
+		cronConfig:     cronConfig,
+		rabbitMQConfig: rabbitMQConfig,
+		channel:        channel,
 	}
 }
 
 func (e *RateNotificationScheduler) StartJob() {
 	c := cron.New()
-	err := c.AddFunc(e.config.RateNotification, func() {
+	err := c.AddFunc(e.cronConfig.RateNotification, func() {
 		event := models.Event{
 			Type:      EventType,
 			Timestamp: time.Now(),
@@ -42,7 +45,7 @@ func (e *RateNotificationScheduler) StartJob() {
 		}
 		err = e.channel.Publish(
 			"",
-			"rate-notification-cron",
+			e.rabbitMQConfig.Queue.RateNotificationCron,
 			false,
 			false,
 			amqp.Publishing{

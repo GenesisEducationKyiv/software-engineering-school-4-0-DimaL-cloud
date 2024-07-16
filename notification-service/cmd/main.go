@@ -42,7 +42,7 @@ func main() {
 
 	mailService := service.NewMailService(config.Mail)
 
-	mailConsumer := consumer.NewMailConsumer(channel, mailService)
+	mailConsumer := consumer.NewMailConsumer(channel, mailService, &config.RabbitMQ)
 	mailConsumer.StartConsuming()
 
 	quit := make(chan os.Signal, 1)

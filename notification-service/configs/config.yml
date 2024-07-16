@@ -3,6 +3,8 @@ rabbitmq:
   port: 5672
   username: rmuser
   password: rmpassword
+  queue:
+    mail: mail
 
 mail:
   host: smtp.gmail.com

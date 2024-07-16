@@ -40,7 +40,7 @@ func main() {
 	defer channel.Close()
 
 	_, err = channel.QueueDeclare(
-		"rate-notification-cron",
+		config.RabbitMQ.Queue.RateNotificationCron,
 		false,
 		false,
 		false,
@@ -50,7 +50,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to declare a queue: %s", err.Error())
 	}
-	rateNotificationScheduler := scheduler.NewRateNotificationScheduler(&config.Crons, channel)
+	rateNotificationScheduler := scheduler.NewRateNotificationScheduler(&config.Crons, &config.RabbitMQ, channel)
 	rateNotificationScheduler.StartJob()
 
 	quit := make(chan os.Signal, 1)

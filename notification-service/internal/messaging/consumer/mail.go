@@ -4,30 +4,32 @@ import (
 	"encoding/json"
 	log "github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
+	"notification-service/internal/configs"
 	"notification-service/internal/models"
 	"notification-service/internal/service"
 )
 
 const (
-	QueueName   = "mail"
 	ServiceName = "mail-service"
 )
 
 type MailConsumer struct {
 	channel     *amqp.Channel
 	mailService service.Mail
+	config      *configs.RabbitMQ
 }
 
-func NewMailConsumer(channel *amqp.Channel, mailService service.Mail) *MailConsumer {
+func NewMailConsumer(channel *amqp.Channel, mailService service.Mail, config *configs.RabbitMQ) *MailConsumer {
 	return &MailConsumer{
 		channel:     channel,
 		mailService: mailService,
+		config:      config,
 	}
 }
 
 func (c *MailConsumer) StartConsuming() {
 	msgs, err := c.channel.Consume(
-		QueueName,
+		c.config.Queue.Mail,
 		ServiceName,
 		false,
 		false,

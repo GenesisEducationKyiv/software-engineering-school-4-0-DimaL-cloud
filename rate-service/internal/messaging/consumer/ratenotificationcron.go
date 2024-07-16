@@ -4,6 +4,7 @@ import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
+	"rate-service/internal/configs"
 	"rate-service/internal/messaging/producer"
 	"rate-service/internal/models"
 	"rate-service/internal/service"
@@ -13,7 +14,6 @@ import (
 const (
 	EmailSubject = "Курс НБУ"
 	EmailBody    = "Курс долара НБУ станом на %s: %f грн"
-	QueueName    = "rate-notification-cron"
 	ServiceName  = "rate-service"
 )
 
@@ -22,24 +22,27 @@ type RateNotificationCronConsumer struct {
 	mailProducer        *producer.MailProducer
 	subscriptionService service.Subscription
 	rateService         service.Rate
+	config              *configs.RabbitMQ
 }
 
 func NewRateNotificationCronConsumer(
 	channel *amqp.Channel,
 	producer *producer.MailProducer,
 	subscriptionService service.Subscription,
-	rateService service.Rate) *RateNotificationCronConsumer {
+	rateService service.Rate,
+	config *configs.RabbitMQ) *RateNotificationCronConsumer {
 	return &RateNotificationCronConsumer{
 		channel:             channel,
 		mailProducer:        producer,
 		subscriptionService: subscriptionService,
 		rateService:         rateService,
+		config:              config,
 	}
 }
 
 func (c *RateNotificationCronConsumer) StartConsuming() {
 	msgs, err := c.channel.Consume(
-		QueueName,
+		c.config.Queue.RateNotificationCron,
 		ServiceName,
 		false,
 		false,
