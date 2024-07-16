@@ -26,7 +26,6 @@ func NewMailService(config configs.Mail) *MailService {
 }
 
 func (m MailService) SendEmails(subject string, body string, to []string) {
-	auth := smtp.PlainAuth("", m.config.Username, m.config.Password, m.config.Host)
 	msg := []byte("Subject: " + subject + "\r\n\r\n" + body)
 
 	var wg sync.WaitGroup
@@ -38,7 +37,7 @@ func (m MailService) SendEmails(subject string, body string, to []string) {
 			for email := range emailTasks {
 				err := smtp.SendMail(
 					m.config.Host+":"+m.config.Port,
-					auth,
+					m.auth,
 					m.config.Username,
 					[]string{email},
 					msg,
