@@ -15,7 +15,6 @@ rate:
     nbu: "https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=USD&json"
     privatbank: "https://api.privatbank.ua/p24api/pubinfo?exchange&json&coursid=11"
     fawazahmed: "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json"
-  notification_cron: "0 8 * * *"
 
 rabbitmq:
   host: localhost
