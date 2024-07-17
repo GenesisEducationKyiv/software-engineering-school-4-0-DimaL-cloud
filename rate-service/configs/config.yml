@@ -24,3 +24,4 @@ rabbitmq:
   queue:
     mail: mail
     rate_notification_cron: rate-notification-cron
+    customer: customer

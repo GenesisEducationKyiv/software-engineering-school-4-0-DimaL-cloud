@@ -1,23 +1,19 @@
 package service
 
 import (
+	"customer-service/internal/configs"
+	"customer-service/internal/repository"
 	log "github.com/sirupsen/logrus"
-	"rate-service/internal/configs"
-	"rate-service/internal/messaging/producer"
-	"rate-service/internal/models"
-	"rate-service/internal/repository"
 )
 
 type Subscription interface {
-	GetAllSubscriptions() ([]models.Subscription, error)
 	CreateCustomer(email string) (int, error)
 	DeleteCustomerByEmail(email string) error
 }
 
 type SubscriptionService struct {
-	repository      repository.Subscription
-	messageProducer producer.Producer
-	rabbitMQConfig  *configs.RabbitMQ
+	repository     repository.Customer
+	rabbitMQConfig *configs.RabbitMQ
 }
 
 func NewSubscriptionService(repository repository.Subscription) *SubscriptionService {
@@ -29,7 +25,7 @@ func (s *SubscriptionService) GetAllSubscriptions() ([]models.Subscription, erro
 }
 
 func (s *SubscriptionService) CreateSubscription(email string) error {
-	id, err := s.repository.CreateCustomer(email)
+	id, err := s.repository.CreateSubscription(email)
 	if err != nil {
 		log.Error("failed to create subscription", err)
 	} else {
@@ -44,7 +40,7 @@ func (s *SubscriptionService) CreateSubscription(email string) error {
 }
 
 func (s *SubscriptionService) DeleteSubscription(email string) error {
-	err := s.repository.DeleteCustomerByEmail(email)
+	err := s.repository.DeleteSubscription(email)
 	if err != nil {
 		log.Error("failed to delete subscription", err)
 	} else {

@@ -19,7 +19,7 @@ const (
 
 type RateNotificationCronConsumer struct {
 	channel             *amqp.Channel
-	mailProducer        *producer.MailProducer
+	messageProducer     producer.Producer
 	subscriptionService service.Subscription
 	rateService         service.Rate
 	config              *configs.RabbitMQ
@@ -27,13 +27,13 @@ type RateNotificationCronConsumer struct {
 
 func NewRateNotificationCronConsumer(
 	channel *amqp.Channel,
-	producer *producer.MailProducer,
+	producer producer.Producer,
 	subscriptionService service.Subscription,
 	rateService service.Rate,
 	config *configs.RabbitMQ) *RateNotificationCronConsumer {
 	return &RateNotificationCronConsumer{
 		channel:             channel,
-		mailProducer:        producer,
+		messageProducer:     producer,
 		subscriptionService: subscriptionService,
 		rateService:         rateService,
 		config:              config,
@@ -83,6 +83,6 @@ func (c *RateNotificationCronConsumer) handleMessage() {
 	}
 	for _, subscription := range subscriptions {
 		sendEmailCommand.To = subscription.Email
-		c.mailProducer.PublishMail(sendEmailCommand)
+		c.messageProducer.PublishMessage(sendEmailCommand, c.config.Queue.Mail)
 	}
 }

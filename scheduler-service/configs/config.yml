@@ -1,5 +1,5 @@
 crons:
-  rate_notification: "0 8 * * *"
+  rate_notification: "*/30 * * * *"
 
 rabbitmq:
   host: localhost
