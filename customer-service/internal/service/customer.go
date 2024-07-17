@@ -46,7 +46,7 @@ func (s *CustomerService) CreateCustomer(customer models.Customer) (int, error) 
 				Type:      CustomerCreationFailedEvent,
 				Timestamp: time.Now(),
 			},
-			SubscriptionId: customer.SubscriptionID,
+			SubscriptionID: customer.SubscriptionID,
 		}
 
 		s.messageProducer.PublishMessage(customerCreationFailedEvent, s.rabbitMQConfig.Queue.CustomerEvent)
@@ -56,7 +56,7 @@ func (s *CustomerService) CreateCustomer(customer models.Customer) (int, error) 
 				Type:      CustomerCreatedEvent,
 				Timestamp: time.Now(),
 			},
-			CustomerId: id,
+			CustomerID: id,
 		}
 		s.messageProducer.PublishMessage(customerCreatedEvent, s.rabbitMQConfig.Queue.CustomerEvent)
 	}

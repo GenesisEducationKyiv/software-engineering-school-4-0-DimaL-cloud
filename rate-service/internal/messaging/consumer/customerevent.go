@@ -72,7 +72,7 @@ func (c *CustomerEventConsumer) handleMessage(msg amqp.Delivery) {
 			log.Errorf("failed to deserialize message: %s", err.Error())
 			return
 		}
-		log.Infof("Customer with id %d created", customerCreatedEvent.CustomerId)
+		log.Infof("Customer with id %d created", customerCreatedEvent.CustomerID)
 	case CustomerCreationFailedEvent:
 		log.Infof("Customer creation failed")
 		var customerCreationFailedEvent models.CustomerCreationFailedEvent
@@ -81,7 +81,7 @@ func (c *CustomerEventConsumer) handleMessage(msg amqp.Delivery) {
 			log.Errorf("failed to deserialize message: %s", err.Error())
 			return
 		}
-		err = c.subscriptionService.DeleteSubscriptionByID(customerCreationFailedEvent.SubscriptionId)
+		err = c.subscriptionService.DeleteSubscriptionByID(customerCreationFailedEvent.SubscriptionID)
 		if err != nil {
 			log.Errorf("failed to remove subscription: %s", err.Error())
 			return

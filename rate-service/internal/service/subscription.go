@@ -46,9 +46,9 @@ func (s *SubscriptionService) CreateSubscription(email string) (int, error) {
 	if err != nil {
 		log.Error("failed to create subscription: ", err)
 		return 0, err
-	} else {
-		log.Info("subscription created for email: ", email)
 	}
+	log.Info("subscription created for email: ", email)
+
 	createCustomerCommand := models.CreateCustomerCommand{
 		Command: models.Command{
 			Type: CreateCustomerCommand,

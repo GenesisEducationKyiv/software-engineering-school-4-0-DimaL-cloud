@@ -11,10 +11,10 @@ type Event struct {
 
 type CustomerCreatedEvent struct {
 	Event
-	CustomerId int `json:"customer_id"`
+	CustomerID int `json:"customer_id"`
 }
 
 type CustomerCreationFailedEvent struct {
 	Event
-	SubscriptionId int `json:"subscription_id"`
+	SubscriptionID int `json:"subscription_id"`
 }

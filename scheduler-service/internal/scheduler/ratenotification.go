@@ -54,7 +54,7 @@ func (e *RateNotificationScheduler) StartJob() {
 			},
 		)
 		if err != nil {
-			log.Fatal("failed to publish event: %s", err.Error())
+			log.Fatalf("failed to publish event: %s", err.Error())
 		} else {
 			log.Info("event published")
 		}

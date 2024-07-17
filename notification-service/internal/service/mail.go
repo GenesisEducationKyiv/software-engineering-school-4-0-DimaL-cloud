@@ -6,10 +6,6 @@ import (
 	"notification-service/internal/configs"
 )
 
-const (
-	maxWorkers = 100
-)
-
 type Mail interface {
 	SendEmail(subject string, body string, to string)
 }

@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	ApplicationJson = "application/json"
+	ApplicationJSON = "application/json"
 )
 
 type Producer interface {
@@ -36,7 +36,7 @@ func (p *MessageProducer) PublishMessage(message any, queue string) {
 		false,
 		false,
 		amqp.Publishing{
-			ContentType: ApplicationJson,
+			ContentType: ApplicationJSON,
 			Body:        serializedMessage,
 		})
 	if err != nil {

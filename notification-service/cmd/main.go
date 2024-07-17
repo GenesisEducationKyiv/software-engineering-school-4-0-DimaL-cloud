@@ -37,7 +37,7 @@ func main() {
 
 	channel, err := conn.Channel()
 	if err != nil {
-		log.Fatalf("failed to open a channel: %s", err.Error())
+		log.Fatalf("failed to open a channel: %s", err.Error()) // nolint: gocritic
 	}
 	defer channel.Close()
 
