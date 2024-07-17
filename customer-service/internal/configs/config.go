@@ -6,6 +6,7 @@ import (
 )
 
 type Config struct {
+	DB       DB       `yaml:"db"`
 	RabbitMQ RabbitMQ `yaml:"rabbitmq"`
 }
 

@@ -43,7 +43,7 @@ func (s *CustomerRepository) CreateCustomer(customer models.Customer) (int, erro
 	return id, nil
 }
 
-func (s *CustomerRepository) DeleteCustomer(email string) error {
+func (s *CustomerRepository) DeleteCustomerByEmail(email string) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE email = $1", CustomerTable)
 	row := s.db.QueryRow(query, email)
 	return row.Err()

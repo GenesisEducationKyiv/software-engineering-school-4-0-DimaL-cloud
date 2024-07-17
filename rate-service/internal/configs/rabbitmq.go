@@ -8,6 +8,7 @@ type RabbitMQ struct {
 	Queue    struct {
 		Mail                 string `yaml:"mail"`
 		RateNotificationCron string `yaml:"rate-notification-cron"`
-		Customer             string `yaml:"customer"`
+		CustomerCommand      string `yaml:"customer-command"`
+		CustomerEvent        string `yaml:"customer-event"`
 	} `yaml:"queue"`
 }

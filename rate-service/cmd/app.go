@@ -89,8 +89,14 @@ func NewApp() *fx.App {
 		fx.Provide(NewMigrateInstance),
 		fx.Provide(NewRabbitMQConnection),
 		fx.Provide(NewRabbitMQChannel),
+		fx.Provide(consumer.NewCustomerEventConsumer),
 		fx.Provide(consumer.NewRateNotificationCronConsumer),
-		fx.Provide(producer.NewMailProducer),
+		fx.Provide(
+			fx.Annotate(
+				producer.NewMessageProducer,
+				fx.As(new(producer.Producer)),
+			),
+		),
 		fx.Invoke(run),
 	)
 }
@@ -132,13 +138,16 @@ func run(
 	migrate *migrate.Migrate,
 	conn *amqp.Connection,
 	rateNotificationCronConsumer *consumer.RateNotificationCronConsumer,
+	customerEventConsumer *consumer.CustomerEventConsumer,
 	channel *amqp.Channel,
 	rabbitMQConfig *configs.RabbitMQ) {
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error { //nolint:revive
 			applyMigrations(migrate)
-			createMailQueue(channel, rabbitMQConfig)
+			createQueue(channel, rabbitMQConfig.Queue.Mail)
+			createQueue(channel, rabbitMQConfig.Queue.CustomerCommand)
 			go rateNotificationCronConsumer.StartConsuming()
+			go customerEventConsumer.StartConsuming()
 			go startServer(server)
 			return nil
 		},
@@ -176,9 +185,9 @@ func startServer(s *http.Server) {
 	}
 }
 
-func createMailQueue(channel *amqp.Channel, config *configs.RabbitMQ) {
+func createQueue(channel *amqp.Channel, queue string) {
 	_, err := channel.QueueDeclare(
-		config.Queue.Mail,
+		queue,
 		true,
 		false,
 		false,

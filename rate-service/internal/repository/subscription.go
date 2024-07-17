@@ -16,8 +16,9 @@ const (
 
 type Subscription interface {
 	GetAllSubscriptions() ([]models.Subscription, error)
-	CreateCustomer(email string) (int, error)
-	DeleteCustomerByEmail(email string) error
+	CreateSubscription(email string) (int, error)
+	DeleteSubscriptionByEmail(email string) error
+	DeleteSubscriptionByID(id int) error
 }
 
 type SubscriptionRepository struct {
@@ -37,7 +38,7 @@ func (s *SubscriptionRepository) GetAllSubscriptions() ([]models.Subscription, e
 	return subscriptions, nil
 }
 
-func (s *SubscriptionRepository) CreateCustomer(email string) (int, error) {
+func (s *SubscriptionRepository) CreateSubscription(email string) (int, error) {
 	query := fmt.Sprintf("INSERT INTO %s (email) VALUES ($1) RETURNING id", SubscriptionTable)
 	var id int
 	err := s.db.QueryRow(query, email).Scan(&id)
@@ -53,8 +54,14 @@ func (s *SubscriptionRepository) CreateCustomer(email string) (int, error) {
 	return id, nil
 }
 
-func (s *SubscriptionRepository) DeleteCustomerByEmail(email string) error {
+func (s *SubscriptionRepository) DeleteSubscriptionByEmail(email string) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE email = $1", SubscriptionTable)
 	row := s.db.QueryRow(query, email)
+	return row.Err()
+}
+
+func (s *SubscriptionRepository) DeleteSubscriptionByID(id int) error {
+	query := fmt.Sprintf("DELETE FROM %s WHERE id = $1", SubscriptionTable)
+	row := s.db.QueryRow(query, id)
 	return row.Err()
 }

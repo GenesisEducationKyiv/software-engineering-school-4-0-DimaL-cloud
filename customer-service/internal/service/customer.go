@@ -2,49 +2,73 @@ package service
 
 import (
 	"customer-service/internal/configs"
+	"customer-service/internal/messaging/producer"
+	"customer-service/internal/models"
 	"customer-service/internal/repository"
 	log "github.com/sirupsen/logrus"
+	"time"
 )
 
-type Subscription interface {
-	CreateCustomer(email string) (int, error)
+const (
+	CustomerCreatedEvent        = "CustomerCreatedEvent"
+	CustomerCreationFailedEvent = "CustomerCreationFailedEvent"
+)
+
+type Customer interface {
+	CreateCustomer(customer models.Customer) (int, error)
 	DeleteCustomerByEmail(email string) error
 }
 
-type SubscriptionService struct {
-	repository     repository.Customer
-	rabbitMQConfig *configs.RabbitMQ
+type CustomerService struct {
+	repository      repository.Customer
+	messageProducer producer.Producer
+	rabbitMQConfig  *configs.RabbitMQ
 }
 
-func NewSubscriptionService(repository repository.Subscription) *SubscriptionService {
-	return &SubscriptionService{repository: repository}
-}
-
-func (s *SubscriptionService) GetAllSubscriptions() ([]models.Subscription, error) {
-	return s.repository.GetAllSubscriptions()
-}
-
-func (s *SubscriptionService) CreateSubscription(email string) error {
-	id, err := s.repository.CreateSubscription(email)
-	if err != nil {
-		log.Error("failed to create subscription", err)
-	} else {
-		log.Info("subscription created for email: ", email)
+func NewCustomerService(
+	repository repository.Customer,
+	rabbitMQConfig *configs.RabbitMQ,
+	messageProducer producer.Producer,
+) *CustomerService {
+	return &CustomerService{
+		repository:      repository,
+		rabbitMQConfig:  rabbitMQConfig,
+		messageProducer: messageProducer,
 	}
-	createCustomerCommand := models.CreateCustomerCommand{
-		Email:          email,
-		SubscriptionID: id,
-	}
-	s.messageProducer.PublishMessage(createCustomerCommand, s.rabbitMQConfig.Queue.Customer)
-	return err
 }
 
-func (s *SubscriptionService) DeleteSubscription(email string) error {
-	err := s.repository.DeleteSubscription(email)
+func (s *CustomerService) CreateCustomer(customer models.Customer) (int, error) {
+	id, err := s.repository.CreateCustomer(customer)
 	if err != nil {
-		log.Error("failed to delete subscription", err)
+		log.Error("failed to create customer: ", err)
+		customerCreationFailedEvent := models.CustomerCreationFailedEvent{
+			Event: models.Event{
+				Type:      CustomerCreationFailedEvent,
+				Timestamp: time.Now(),
+			},
+			SubscriptionId: customer.SubscriptionID,
+		}
+
+		s.messageProducer.PublishMessage(customerCreationFailedEvent, s.rabbitMQConfig.Queue.CustomerEvent)
 	} else {
-		log.Info("subscription deleted for email: ", email)
+		customerCreatedEvent := models.CustomerCreatedEvent{
+			Event: models.Event{
+				Type:      CustomerCreatedEvent,
+				Timestamp: time.Now(),
+			},
+			CustomerId: id,
+		}
+		s.messageProducer.PublishMessage(customerCreatedEvent, s.rabbitMQConfig.Queue.CustomerEvent)
+	}
+	return id, err
+}
+
+func (s *CustomerService) DeleteCustomerByEmail(email string) error {
+	err := s.repository.DeleteCustomerByEmail(email)
+	if err != nil {
+		log.Error("failed to delete customer", err)
+	} else {
+		log.Info("customer deleted for email: ", email)
 	}
 	return err
 }

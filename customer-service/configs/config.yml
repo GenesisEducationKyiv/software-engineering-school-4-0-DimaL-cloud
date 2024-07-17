@@ -1,7 +1,17 @@
+db:
+  host: localhost
+  port: 5432
+  username: postgres
+  password: admin
+  name: postgres
+  ssl_mode: disable
+  driver_name: postgres
+
 rabbitmq:
   host: localhost
   port: 5672
   username: rmuser
   password: rmpassword
   queue:
-    customer: customer
+    customer-command: customer-command
+    customer-event: customer-event
