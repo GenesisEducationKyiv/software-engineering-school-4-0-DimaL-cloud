@@ -1,0 +1,10 @@
+crons:
+  rate_notification: "0 8 * * *"
+
+rabbitmq:
+  host: localhost
+  port: 5672
+  username: rmuser
+  password: rmpassword
+  queue:
+    rate-notification-cron: rate-notification-cron
