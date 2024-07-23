@@ -1,9 +1,12 @@
 package main
 
 import (
+	"context"
 	"customer-service/internal/configs"
+	"customer-service/internal/handler"
 	"customer-service/internal/messaging/consumer"
 	"customer-service/internal/messaging/producer"
+	"customer-service/internal/models"
 	"customer-service/internal/repository"
 	"customer-service/internal/service"
 	"errors"
@@ -13,15 +16,18 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	log "github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 const (
 	MigrationsPath          = "file://migrations"
 	ConfigPath              = "configs/config.yml"
 	RabbitMQConnStrTemplate = "amqp://%s:%s@%s:%s/"
+	ShutdownTimeout         = 5 * time.Second
 )
 
 func main() {
@@ -86,10 +92,24 @@ func main() {
 	customerCommandConsumer := consumer.NewCustomerConsumer(channel, customerService, &config.RabbitMQ)
 	customerCommandConsumer.StartConsuming()
 
+	h := handler.NewHandler()
+	s := models.NewServer(h.InitRoutes(), &config.Server)
+	if err := s.ListenAndServe(); err != nil {
+		if !errors.Is(err, http.ErrServerClosed) {
+			log.Fatalf("failed to start server: %s", err.Error())
+		}
+	}
+
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
+	ctx, cancel := context.WithTimeout(context.Background(), ShutdownTimeout)
+	defer cancel()
+
+	if err := s.Shutdown(ctx); err != nil {
+		log.Errorf("error occurred while shutting down server: %s", err.Error())
+	}
 	if err := conn.Close(); err != nil {
 		log.Errorf("error occurred while closing RabbitMQ connection: %s", err.Error())
 	}
