@@ -22,6 +22,7 @@ func NewHandler(rateService service.Rate, subscriptionService service.Subscripti
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	router.GET("/metrics", h.metrics)
 	api := router.Group("/api")
 	{
 		api.POST("/subscribe", h.subscribe)
