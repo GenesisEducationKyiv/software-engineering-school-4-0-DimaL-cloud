@@ -58,9 +58,6 @@ func (e *RateNotificationScheduler) StartJob() {
 		} else {
 			log.Info("event published")
 		}
-		if err != nil {
-			log.Fatalf("failed to save event: %s", err.Error())
-		}
 	})
 	if err != nil {
 		log.Fatalf("failed to schedule rate notification job: %s", err.Error())
