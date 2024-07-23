@@ -1,0 +1,26 @@
+server:
+  port: 8080
+
+db:
+  host: localhost
+  port: 5432
+  username: postgres
+  password: admin
+  name: postgres
+  ssl_mode: disable
+  driver_name: postgres
+
+rate:
+  api_urls:
+    nbu: "https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=USD&json"
+    privatbank: "https://api.privatbank.ua/p24api/pubinfo?exchange&json&coursid=11"
+    fawazahmed: "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json"
+
+rabbitmq:
+  host: localhost
+  port: 5672
+  username: rmuser
+  password: rmpassword
+  queue:
+    mail: mail
+    rate_notification_cron: rate-notification-cron
