@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"github.com/VictoriaMetrics/metrics"
 	"github.com/avast/retry-go/v4"
 	log "github.com/sirupsen/logrus"
 	"rate-service/internal/client/rate"
@@ -10,6 +11,10 @@ import (
 const (
 	RetriesAmount = 3
 	Delay         = 100
+)
+
+var (
+	RateServiceRequestsErrorsTotal = metrics.GetOrCreateCounter(`rate_service_requests_errors_total`)
 )
 
 type Rate interface {
@@ -42,6 +47,7 @@ func (r *RateService) GetRate() (float64, error) {
 			log.Infof("API response from %s: %s", rateResponse.APIName, rateResponse.APIResponse)
 			return rateResponse.RateValue, nil
 		}
+		RateServiceRequestsErrorsTotal.Inc()
 		currentClient = currentClient.GetNext()
 	}
 	return 0, errors.New("failed to get exchange rate from all APIs")
