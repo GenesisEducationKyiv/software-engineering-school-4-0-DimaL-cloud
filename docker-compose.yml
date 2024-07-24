@@ -34,6 +34,17 @@ services:
     depends_on:
       - rate-service-db
       - rabbitmq
+  customer-service:
+    image: customer-service:latest
+    ports:
+      - "8083:8080"
+    build:
+      context: ./scheduler-service
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - rate-service-db
+      - rabbitmq
   rate-service-db:
     image: postgres:latest
     environment:
@@ -62,3 +73,20 @@ services:
     ports:
       - "15672:15672"
       - "5672:5672"
+  grafana:
+    image: grafana/grafana:9.1.0
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=admin
+  victoriametrics:
+    image: victoriametrics/victoria-metrics
+    container_name: victoriametrics
+    restart: always
+    ports:
+      - "8428:8428"
+    command: -promscrape.config=/scrape-config.yml
+    volumes:
+      - ./scrape-config.yml:/scrape-config.yml

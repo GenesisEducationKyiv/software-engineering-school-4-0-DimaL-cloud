@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"fmt"
+	"github.com/VictoriaMetrics/metrics"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -21,6 +23,7 @@ func NewHandler(rateService service.Rate, subscriptionService service.Subscripti
 
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
+	router.Use(HTTPRequestMetricsMiddleware())
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.GET("/metrics", h.metrics)
 	api := router.Group("/api")
@@ -30,4 +33,13 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		api.GET("/rate", h.rate)
 	}
 	return router
+}
+
+func HTTPRequestMetricsMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		path := c.Request.URL.Path
+		c.Next()
+		statusCode := c.Writer.Status()
+		metrics.GetOrCreateCounter(fmt.Sprintf(`http_requests_total{path="%s", status="%d"}`, path, statusCode)).Inc()
+	}
 }
