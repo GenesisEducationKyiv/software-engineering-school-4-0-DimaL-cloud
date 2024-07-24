@@ -27,8 +27,8 @@ docker-compose up -d
 
 ## Alerts :warning:
 1. Total failed rate notification jobs > 0
-- if rate notification jobs was failed, users won't get notifications
+- if rate notification job was failed, users won't get notifications
 2. Microservice is not alive
 - if one of the services is not alive, users can face with difficulties
 3. Total email send errors > 0
-- if email was not sent, users won't get notifications
+- if email was not sent, user won't get notifications
