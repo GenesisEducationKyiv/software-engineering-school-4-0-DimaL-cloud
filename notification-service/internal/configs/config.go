@@ -8,6 +8,7 @@ import (
 type Config struct {
 	Mail     Mail     `yaml:"mail"`
 	RabbitMQ RabbitMQ `yaml:"rabbitmq"`
+	Server   Server   `yaml:"server"`
 }
 
 func NewConfig(configPath string) (*Config, error) {

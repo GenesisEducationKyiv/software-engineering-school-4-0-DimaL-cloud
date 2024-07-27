@@ -8,6 +8,7 @@ import (
 type Config struct {
 	DB       DB       `yaml:"db"`
 	RabbitMQ RabbitMQ `yaml:"rabbitmq"`
+	Server   Server   `yaml:"server"`
 }
 
 func NewConfig(configPath string) (*Config, error) {

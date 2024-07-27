@@ -1,9 +1,14 @@
 package service
 
 import (
+	"github.com/VictoriaMetrics/metrics"
 	log "github.com/sirupsen/logrus"
 	"net/smtp"
 	"notification-service/internal/configs"
+)
+
+var (
+	emailSendErrorsTotal = metrics.GetOrCreateCounter(`email_send_errors_total`)
 )
 
 type Mail interface {
@@ -32,5 +37,6 @@ func (m MailService) SendEmail(subject string, body string, to string) {
 	)
 	if err != nil {
 		log.Errorf("failed to send email to %s: %s", to, err.Error())
+		emailSendErrorsTotal.Inc()
 	}
 }

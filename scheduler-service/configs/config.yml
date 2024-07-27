@@ -1,3 +1,6 @@
+server:
+  port: 8080
+
 crons:
   rate_notification: "*/30 * * * *"
 

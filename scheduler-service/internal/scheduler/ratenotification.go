@@ -2,6 +2,7 @@ package scheduler
 
 import (
 	"encoding/json"
+	"github.com/VictoriaMetrics/metrics"
 	"github.com/robfig/cron"
 	log "github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
@@ -12,6 +13,11 @@ import (
 
 const (
 	EventType = "RateSchedulerTriggeredEvent"
+)
+
+var (
+	rateNotificationJobTotal       = metrics.GetOrCreateCounter(`rate_notification_job_total`)
+	rateNotificationJobErrorsTotal = metrics.GetOrCreateCounter(`rate_notification_job_errors_total`)
 )
 
 type RateNotificationScheduler struct {
@@ -35,6 +41,7 @@ func NewRateNotificationScheduler(
 func (e *RateNotificationScheduler) StartJob() {
 	c := cron.New()
 	err := c.AddFunc(e.cronConfig.RateNotification, func() {
+		rateNotificationJobTotal.Inc()
 		event := models.Event{
 			Type:      EventType,
 			Timestamp: time.Now(),
@@ -42,6 +49,7 @@ func (e *RateNotificationScheduler) StartJob() {
 		serializedEvent, err := json.Marshal(event)
 		if err != nil {
 			log.Fatalf("failed to serialize event: %s", err.Error())
+			rateNotificationJobErrorsTotal.Inc()
 		}
 		err = e.channel.Publish(
 			"",
@@ -55,6 +63,7 @@ func (e *RateNotificationScheduler) StartJob() {
 		)
 		if err != nil {
 			log.Fatalf("failed to publish event: %s", err.Error())
+			rateNotificationJobErrorsTotal.Inc()
 		} else {
 			log.Info("event published")
 		}
